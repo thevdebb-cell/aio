@@ -1,12 +1,5 @@
-/* ============================================================
-   CRD - Central Record Directory - by NYUC team
-   Full-screen app shell. Dark + Light themes.
-   Login is ALWAYS dark. Icons are SVG masks tinted to the theme.
-   ============================================================ */
-
 * { box-sizing: border-box; }
 
-/* -------- DARK theme (default, and the only theme the login uses) -------- */
 :root {
   --bg:        #0b1220;
   --bg-2:      #0d1526;
@@ -31,7 +24,6 @@
   --sidebar-w: 236px;
 }
 
-/* -------- LIGHT theme (app only, never the login) -------- */
 html[data-theme="light"] {
   --bg:        #eef1f6;
   --bg-2:      #e7ebf2;
@@ -66,9 +58,6 @@ a { color: inherit; }
 .mono { font-family: "Lucida Console", Monaco, monospace; }
 .hidden { display: none !important; }
 
-/* ===================== ICON SYSTEM ===================== */
-/* Any SVG dropped in assets/icons/<name>.svg is tinted to the
-   current text color, so it works in both dark and light mode. */
 .ic {
   display: inline-block; width: 1.15em; height: 1.15em; flex: none;
   background-color: currentColor;
@@ -79,10 +68,8 @@ a { color: inherit; }
 .ic.lg { width: 1.5em; height: 1.5em; }
 .ic.xl { width: 2.1em; height: 2.1em; }
 
-/* ===================== LOGIN (always dark) ===================== */
 .login-wrap {
-  /* re-declare dark vars here so the login stays dark even when the
-     app theme is set to light */
+
   --bg: #0b1220; --panel: #121d34; --line: #26385c; --text: #eef2f8;
   --muted: #90a1c2; --accent: #7fb2e6; --accent-2: #a9cbe5;
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -123,7 +110,6 @@ a { color: inherit; }
   letter-spacing: 2px; padding: 16px; border-radius: 10px; margin-top: 10px; font-size: 15px;
 }
 
-/* ===================== APP SHELL ===================== */
 .app-shell { display: flex; min-height: 100vh; }
 
 .sidebar {
@@ -157,7 +143,6 @@ a { color: inherit; }
 .user-chip .un { font-size: 12px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .user-chip .ur { font-size: 10px; color: var(--muted); }
 
-/* main column */
 .main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 .topbar {
   display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--line);
@@ -178,13 +163,11 @@ a { color: inherit; }
 .scroll { flex: 1; overflow-y: auto; padding: 26px 30px 70px; }
 .wrap { max-width: 1120px; margin: 0 auto; }
 
-/* headings */
 .page-title { font-size: 24px; margin: 0 0 4px; color: var(--text); font-weight: bold; }
 .page-sub { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
 .sec-title { font-size: 16px; margin: 26px 0 12px; color: var(--text); font-weight: bold; display: flex; align-items: center; gap: 8px; }
 .small { font-size: 12px; color: var(--muted); }
 
-/* banner strip */
 .banner {
   display: flex; align-items: center; gap: 10px;
   border-left: 4px solid var(--accent); background: var(--panel-2); padding: 12px 16px;
@@ -192,7 +175,6 @@ a { color: inherit; }
 }
 .banner.red { border-left-color: var(--red); background: rgba(230,57,70,0.1); color: #ffb3b8; }
 
-/* ===================== DASHBOARD ===================== */
 .hero {
   border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); margin-bottom: 22px;
   background: linear-gradient(120deg, var(--panel-2), var(--panel)); position: relative;
@@ -222,7 +204,6 @@ a { color: inherit; }
 .tile .tile-label { color: var(--text); font-weight: bold; font-size: 16px; }
 .tile .tile-count { color: var(--muted); font-size: 12px; }
 
-/* ===================== LISTS / ROWS ===================== */
 .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 16px; }
 .toolbar .grow { flex: 1; }
 
@@ -248,7 +229,6 @@ a { color: inherit; }
 .case-num { font-weight: bold; color: var(--accent); }
 .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border: 1px dashed var(--line); border-radius: var(--radius); }
 
-/* pills */
 .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 11px; border-radius: 999px; font-size: 11px; font-weight: bold; white-space: nowrap; }
 .pill-green { background: rgba(62,207,142,0.16); color: var(--green); }
 .pill-red   { background: rgba(230,57,70,0.16); color: #ff8a92; }
@@ -258,7 +238,6 @@ a { color: inherit; }
 html[data-theme="light"] .pill-red { color: var(--red); }
 html[data-theme="light"] .pill-blue { color: var(--accent); }
 
-/* ===================== CARDS / DETAIL ===================== */
 .card { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); padding: 20px; margin-top: 16px; }
 .card h3 { margin: 0 0 12px; font-size: 16px; color: var(--text); display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 .profile-top { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
@@ -274,7 +253,6 @@ html[data-theme="light"] .pill-blue { color: var(--accent); }
 .lnk:hover { text-decoration: underline; }
 .actions { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line-soft); display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* ===================== BUTTONS ===================== */
 .btn {
   display: inline-flex; align-items: center; gap: 7px; border: 1px solid transparent; padding: 9px 15px; border-radius: 9px;
   font-size: 13px; font-weight: bold; cursor: pointer; font-family: Arial; line-height: 1; white-space: nowrap;
@@ -292,7 +270,6 @@ html[data-theme="light"] .pill-blue { color: var(--accent); }
 .btn.icon { padding: 8px; }
 .btn:disabled { opacity: 0.5; cursor: default; }
 
-/* ===================== FORMS ===================== */
 label.lbl { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 5px; }
 input[type=text], input[type=password], textarea, select {
   width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px;
@@ -309,7 +286,6 @@ select option { background: var(--panel); color: var(--text); }
 .msg-ok { color: var(--green); font-weight: bold; font-size: 13px; margin-top: 10px; }
 .msg-err { color: #ff8a92; font-weight: bold; font-size: 13px; margin-top: 10px; }
 
-/* ===================== FILES (proof / documents) ===================== */
 .filegrid { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
 .filecard { border: 1px solid var(--line); background: var(--panel-2); border-radius: var(--radius-sm); overflow: hidden; }
 .filecard .fc-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
@@ -335,7 +311,6 @@ select option { background: var(--panel); color: var(--text); }
 .tag .x { cursor: pointer; color: var(--muted); }
 .tag .x:hover { color: var(--red); }
 
-/* ===================== MODAL ===================== */
 .modal-back { position: fixed; inset: 0; background: rgba(6,10,20,0.6); backdrop-filter: blur(2px); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 50; overflow-y: auto; }
 .modal { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); width: 620px; max-width: 100%; box-shadow: var(--shadow); }
 .modal-head { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
@@ -345,7 +320,6 @@ select option { background: var(--panel); color: var(--text); }
 .modal-body { padding: 18px 20px; }
 .modal-foot { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
 
-/* ===================== TOASTS ===================== */
 .toasts { position: fixed; right: 18px; bottom: 18px; display: flex; flex-direction: column; gap: 8px; z-index: 80; }
 .toast { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 12px 16px; font-size: 13px; box-shadow: var(--shadow); max-width: 340px; animation: slidein .2s; }
 .toast.err { border-left-color: var(--red); }
@@ -355,10 +329,8 @@ select option { background: var(--panel); color: var(--text); }
 .audit-row { border-bottom: 1px solid var(--line-soft); padding: 10px 4px; font-size: 12px; color: var(--text); display: flex; gap: 8px; align-items: baseline; }
 .footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: 34px; }
 
-/* scrim for the mobile drawer */
 .scrim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8; }
 
-/* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .hamburger { display: flex; }
   .sidebar {
@@ -382,7 +354,6 @@ select option { background: var(--panel); color: var(--text); }
   .actions { gap: 6px; }
 }
 
-/* long-press / copy behaviour on touch (keep case ids selectable) */
 @media (hover: none) and (pointer: coarse) {
   .row-item, .tile, .side-nav a, .btn, .sub { -webkit-tap-highlight-color: transparent; }
 }

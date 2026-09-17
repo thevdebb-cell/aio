@@ -1,9 +1,3 @@
-// ============================================================
-//  CRD front-end. Talks only to our Netlify functions.
-//  The Supabase key stays server side, never here. No record
-//  is ever embedded in the HTML: everything is fetched with a
-//  valid session token that the server verifies.
-// ============================================================
 
 var TOKEN = null;
 var USER = null;
@@ -14,7 +8,6 @@ var SECTION_LABEL = { main: 'Active', inactive: 'Inactive', revamp: 'Before Reva
 var CAT_SECTION   = { active: 'main', inactive: 'inactive', before_revamp: 'revamp', archived: 'archive' };
 var SUB = { main: 'staff', inactive: 'staff', revamp: 'staff', archive: 'cases' };
 
-// ---------- tiny helpers ----------
 async function api(fn, data) {
   try {
     var res = await fetch('/.netlify/functions/' + fn, {
@@ -51,7 +44,6 @@ function bytes(n) {
   return (n / 1073741824).toFixed(2) + ' GB';
 }
 
-// ---------- toasts ----------
 function toast(msg, kind) {
   var el = document.createElement('div');
   el.className = 'toast ' + (kind || '');
@@ -60,7 +52,6 @@ function toast(msg, kind) {
   setTimeout(function () { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(function () { el.remove(); }, 300); }, 3200);
 }
 
-// ---------- modal ----------
 function openModal(opts) {
   var foot = opts.footer || '';
   $('modal-root').innerHTML =
@@ -77,7 +68,6 @@ function openModal(opts) {
 }
 function closeModal() { $('modal-root').innerHTML = ''; }
 
-// ---------- confirm ----------
 function confirmDo(message, onYes) {
   openModal({
     title: 'Please confirm', icon: 'alert',
@@ -88,21 +78,18 @@ function confirmDo(message, onYes) {
   $('cf-yes').onclick = function () { closeModal(); onYes(); };
 }
 
-// ---------- token storage ----------
 function saveToken(token, remember) {
   try { if (remember) localStorage.setItem('crd_token', token); else sessionStorage.setItem('crd_token', token); } catch (e) {}
 }
 function readToken() { try { return localStorage.getItem('crd_token') || sessionStorage.getItem('crd_token'); } catch (e) { return null; } }
 function clearToken() { try { localStorage.removeItem('crd_token'); sessionStorage.removeItem('crd_token'); } catch (e) {} }
 
-// ---------- theme (dark default; app only; login stays dark) ----------
 function currentTheme() { try { return localStorage.getItem('crd_theme') || 'dark'; } catch (e) { return 'dark'; } }
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   var lbl = $('theme-label'), tic = $('theme-ic');
   if (lbl) lbl.textContent = t === 'light' ? 'Light' : 'Dark';
   if (tic) tic.style.setProperty('--src', "url('assets/icons/" + (t === 'light' ? 'sun' : 'moon') + ".svg')");
-  // sidebar logo follows the theme; login always uses the dark-bg logo
   var sl = $('side-logo');
   if (sl) { sl.src = (t === 'light') ? 'assets/logo-on-light.png' : 'assets/logo-on-dark.png'; }
 }
@@ -112,7 +99,6 @@ function toggleTheme() {
   applyTheme(t);
 }
 
-// ---------- boot / login ----------
 async function boot() {
   applyTheme(currentTheme());
   var saved = readToken();
@@ -172,11 +158,9 @@ async function logout() {
   location.reload();
 }
 
-// ---------- mobile drawer ----------
 function openNav() { $('app').classList.add('nav-open'); }
 function closeNav() { $('app').classList.remove('nav-open'); }
 
-// ---------- routing ----------
 var PAGES = ['home', 'main', 'inactive', 'revamp', 'archive', 'search', 'admin'];
 var TITLES = { home: 'Dashboard', main: 'Main Work', inactive: 'Inactive', revamp: 'Before Revamp', archive: 'Archive', search: 'Search', admin: 'Admin' };
 
@@ -213,9 +197,6 @@ window.onhashchange = routeFromUrl;
 
 function canWrite() { return !!(USER && USER.is_whitelist); }
 
-// ============================================================
-//  DASHBOARD
-// ============================================================
 async function loadDashboard() {
   var r = await api('records', { action: 'dashboard' });
   var counts = r.counts || {};
@@ -242,7 +223,6 @@ async function loadDashboard() {
     '</div>';
   }).join('');
 
-  // recent cases
   var rc = r.recentCases || [];
   var recentHtml = '<h3 class="sec-title">' + ic('folder') + ' Recent cases</h3>';
   if (!rc.length) recentHtml += '<div class="empty">No case recorded yet.</div>';
@@ -253,7 +233,6 @@ async function loadDashboard() {
   }
   $('dash-recent').innerHTML = recentHtml;
 
-  // recent activity (owner only)
   if (r.isOwner && (r.activity || []).length) {
     $('dash-activity').innerHTML = '<h3 class="sec-title">' + ic('history') + ' Recent activity</h3>' +
       (r.activity).map(function (a) {
@@ -267,9 +246,6 @@ function statCard(icon, num, label) {
     '<div class="st-num">' + esc(num) + '</div><div class="st-lab">' + esc(label) + '</div></div>';
 }
 
-// ============================================================
-//  SECTIONS (main / inactive / revamp / archive)
-// ============================================================
 function buildSubtabs(section) {
   var order = (section === 'archive') ? ['cases', 'staff'] : ['staff', 'cases'];
   var labels = {
@@ -327,7 +303,11 @@ function caseRow(section, c) {
     '<div class="ri-ic">' + ic('folder') + '</div>' +
     '<div class="ri-main"><span class="ri-title mono case-num">' + esc(c.number) + '</span>' +
     '<span class="ri-sub">' + esc(c.subjectUsername || 'Unknown') + (c.subjectMatter ? ' &middot; ' + esc(String(c.subjectMatter).slice(0, 48)) : '') + '</span></div>' +
-    '<div class="ri-end">' + statusPill(c) + ((c.proof && c.proof.length) ? '<span class="pill pill-grey">' + ic('paperclip') + ' ' + c.proof.length + '</span>' : '') + '</div>' +
+    '<div class="ri-end">' + statusPill(c) +
+      (c.locked ? '<span class="pill pill-grey">' + ic('lock') + '</span>' : '') +
+      (['confidential', 'secret'].indexOf(c.confidentiality) !== -1 ? '<span class="pill pill-red">' + ic('shield') + '</span>' : '') +
+      ((c.proof && c.proof.length) ? '<span class="pill pill-grey">' + ic('paperclip') + ' ' + c.proof.length + '</span>' : '') +
+    '</div>' +
   '</div>';
 }
 function statusPill(c) {
@@ -338,6 +318,37 @@ function statusPill(c) {
   else if (/await|pending|review/.test(s)) cls = 'pill-yellow';
   else if (/archiv|file/.test(s)) cls = 'pill-grey';
   return '<span class="pill ' + cls + '">' + esc(c.status || c.category) + '</span>';
+}
+
+var STATUS_OPTIONS = ['Active', 'Open', 'Under Review', 'Awaiting', 'On Hold', 'Confirmed', 'Closed', 'Expired', 'Dismissed', 'On file'];
+var CONF_LEVELS = ['public', 'internal', 'restricted', 'confidential', 'secret'];
+var CONF_META = {
+  public: { label: 'Public', cls: 'pill-green' },
+  internal: { label: 'Internal', cls: 'pill-blue' },
+  restricted: { label: 'Restricted', cls: 'pill-yellow' },
+  confidential: { label: 'Confidential', cls: 'pill-red' },
+  secret: { label: 'Secret', cls: 'pill-red' }
+};
+function confPill(conf) {
+  var m = CONF_META[conf || 'internal'] || CONF_META.internal;
+  return '<span class="pill ' + m.cls + '">' + ic('shield') + ' ' + m.label + '</span>';
+}
+function priorityPill(p) {
+  if (!p) return '';
+  var s = String(p).toLowerCase();
+  var cls = /crit/.test(s) ? 'pill-red' : /high/.test(s) ? 'pill-yellow' : /low/.test(s) ? 'pill-grey' : 'pill-blue';
+  return '<span class="pill ' + cls + '">' + esc(p) + '</span>';
+}
+function lockPill() { return '<span class="pill pill-grey">' + ic('lock') + ' Locked</span>'; }
+
+function selectHtml(id, options, current, placeholderNone) {
+  var opts = (placeholderNone ? '<option value="">' + esc(placeholderNone) + '</option>' : '') +
+    options.map(function (o) {
+      var v = (typeof o === 'object') ? o.value : o;
+      var l = (typeof o === 'object') ? o.label : o;
+      return '<option value="' + esc(v) + '"' + (String(v) === String(current || '') ? ' selected' : '') + '>' + esc(l) + '</option>';
+    }).join('');
+  return '<select id="' + id + '">' + opts + '</select>';
 }
 
 function renderStaffList(section, list) {
@@ -351,9 +362,6 @@ function renderCaseList(section, list) {
   el.innerHTML = '<div class="list">' + list.map(function (c) { return caseRow(section, c); }).join('') + '</div>';
 }
 
-// ============================================================
-//  STAFF DETAIL
-// ============================================================
 function avatarHtml(s) {
   var initials = esc((s.username || '?').substring(0, 2).toUpperCase());
   if (!s.robloxAvatar) return '<div class="pp-text">' + initials + '</div>';
@@ -386,7 +394,6 @@ async function openStaff(section, id) {
   }
   html += '</div>';
 
-  // documents section
   html += fileSection('Documents', 'staff_documents', s.id, s.documents || [], 'file');
 
   var det = $(section + '-detail');
@@ -394,55 +401,91 @@ async function openStaff(section, id) {
   det.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ============================================================
-//  CASE DETAIL
-// ============================================================
 async function openCase(section, number) {
   var r = await api('records', { action: 'get_case', number: number });
   if (!r.found) return;
   var c = r.case;
+  var det = $(section + '-detail');
 
+  if (c.redacted) {
+    det.innerHTML = '<div class="card"><h3>' + ic('folder') + '<span class="mono case-num">' + esc(c.number) + '</span> ' + statusPill(c) + ' ' + confPill(c.confidentiality) + '</h3>' +
+      '<div class="banner red">' + ic('shield') + ' Restricted - you do not have clearance to view the content of this case. Ask a whitelisted member.</div></div>';
+    det.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  var locked = !!c.locked;
   var auth = (c.authorizations || []).map(function (a) { return '<span class="tag">' + ic('user-check') + ' ' + esc(a) + '</span>'; }).join('');
+  var tags = (c.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
 
-  var html = '<div class="card">' +
-    '<h3>' + ic('folder') + '<span class="mono case-num">' + esc(c.number) + '</span> ' + statusPill(c) +
-      (c.classified ? ' <span class="pill pill-grey">' + ic('lock') + ' classified</span>' : '') + '</h3>' +
+  var head = '<div class="card">' +
+    '<h3>' + ic('folder') + '<span class="mono case-num">' + esc(c.number) + '</span> ' + statusPill(c) + ' ' + confPill(c.confidentiality) +
+      (locked ? ' ' + lockPill() : '') +
+      (c.priority ? ' ' + priorityPill(c.priority) : '') +
+      (c.classified ? ' <span class="pill pill-grey">classified</span>' : '') + '</h3>' +
+    (locked ? '<div class="banner">' + ic('lock') + ' This case is locked' + (c.lockedBy ? ' by ' + esc(c.lockedBy) : '') + '. Content is read-only until it is unlocked.</div>' : '') +
     '<p class="field"><b>Subject:</b> ' + esc(c.subjectUsername || 'Unknown') + (c.subjectId ? ' (<span class="mono">' + esc(c.subjectId) + '</span>)' : '') + '</p>' +
+    (c.department ? '<p class="field"><b>Department:</b> ' + esc(c.department) + '</p>' : '') +
+    (c.lead ? '<p class="field"><b>Lead investigator:</b> ' + esc(c.lead) + '</p>' : '') +
     (c.approxDate ? '<p class="field"><b>Roughly when:</b> ' + esc(c.approxDate) + '</p>' : (c.date ? '<p class="field"><b>Opened:</b> ' + esc(fmtDate(c.date)) + '</p>' : '')) +
     (c.subjectMatter ? '<p class="field"><b>Subject matter:</b> ' + esc(c.subjectMatter) + '</p>' : '') +
     (c.testimony ? '<p class="field"><b>Testimony:</b> ' + esc(c.testimony) + '</p>' : '') +
-    '<p class="field"><b>Added by:</b> ' + esc(c.addedBy || '-') + '</p>' +
-    '<div class="actions">' +
-      '<button class="btn ghost" onclick="exportCasePdf(\'' + esc(c.number) + '\')">' + ic('pdf') + ' Export PDF</button>' +
-      '<button class="btn ghost" onclick="exportCaseWord(\'' + esc(c.number) + '\')">' + ic('word') + ' Export Word</button>' +
-      (canWrite() ? '<button class="btn ghost" onclick="editCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('edit') + ' Edit</button>' : '') +
-      (canWrite() && c.category !== 'archived' ? '<button class="btn gold" onclick="doArchiveCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('archive') + ' Move to Archive</button>' : '') +
-      (canWrite() ? '<button class="btn danger" onclick="doDeleteCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('trash') + ' Delete</button>' : '') +
-    '</div>' +
-  '</div>';
+    (c.outcome ? '<p class="field"><b>Outcome:</b> ' + esc(c.outcome) + '</p>' : '') +
+    (tags ? '<p class="field"><b>Tags:</b> ' + tags + '</p>' : '') +
+    (c.source === 'milweb' ? '<p class="small">' + ic('info') + ' Synced from MilWeb (Dillan).</p>' : '') +
+    '<p class="field"><b>Added by:</b> ' + esc(c.addedBy || '-') + '</p>';
 
-  // user authorization section
-  html += '<div class="card"><h3>' + ic('user-check') + ' User Authorization</h3>' +
-    '<p class="small">Personnel authorized to handle or view this case.</p>' +
-    '<div>' + (auth || '<span class="small">No one recorded.</span>') + '</div>' +
-    (canWrite() ? '<div class="actions"><button class="btn ghost" onclick="editAuthorizations(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('edit') + ' Edit authorizations</button></div>' : '') +
-  '</div>';
+  if (canWrite() && !locked) {
+    head += '<div class="field" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b>Quick status:</b> ' +
+      '<span style="max-width:220px;">' + selectHtml('qs-' + escId(c.number), STATUS_OPTIONS, c.status) + '</span>' +
+      '<button class="btn ghost sm" onclick="setCaseStatus(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('check') + ' Apply</button></div>';
+  }
 
-  // proof + documents sections
-  html += fileSection('Proof &amp; Evidence', 'case_proof', c.number, c.proof || [], 'paperclip');
-  html += fileSection('Authorization Documents', 'case_documents', c.number, c.documents || [], 'file');
+  head += '<div class="actions">' +
+    '<button class="btn ghost" onclick="exportCasePdf(\'' + esc(c.number) + '\')">' + ic('pdf') + ' Export PDF</button>' +
+    '<button class="btn ghost" onclick="exportCaseWord(\'' + esc(c.number) + '\')">' + ic('word') + ' Export Word</button>';
+  if (canWrite()) {
+    head += '<button class="btn ' + (locked ? 'gold' : 'ghost') + '" onclick="toggleLock(\'' + section + '\',\'' + esc(c.number) + '\',' + (locked ? 'false' : 'true') + ')">' + ic('lock') + (locked ? ' Unlock' : ' Lock') + '</button>';
+    if (!locked) {
+      head += '<button class="btn ghost" onclick="editCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('edit') + ' Edit</button>' +
+        (c.category !== 'archived' ? '<button class="btn gold" onclick="doArchiveCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('archive') + ' Archive</button>' : '') +
+        '<button class="btn danger" onclick="doDeleteCase(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('trash') + ' Delete</button>';
+    }
+  }
+  head += '</div></div>';
 
-  var det = $(section + '-detail');
+  var html = head +
+    '<div class="card"><h3>' + ic('user-check') + ' User Authorization</h3>' +
+      '<p class="small">Personnel authorized to handle or view this case.</p>' +
+      '<div>' + (auth || '<span class="small">No one recorded.</span>') + '</div>' +
+      (canWrite() && !locked ? '<div class="actions"><button class="btn ghost" onclick="editAuthorizations(\'' + section + '\',\'' + esc(c.number) + '\')">' + ic('edit') + ' Edit authorizations</button></div>' : '') +
+    '</div>';
+
+  html += fileSection('Proof &amp; Evidence', 'case_proof', c.number, c.proof || [], 'paperclip', locked);
+  html += fileSection('Authorization Documents', 'case_documents', c.number, c.documents || [], 'file', locked);
+
   det.innerHTML = html;
   det.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // auto-load small image previews
   autoPreview(section);
 }
 
-// ============================================================
-//  FILE SECTIONS (proof / documents)  -  any format
-// ============================================================
+function escId(s) { return String(s).replace(/[^\w-]/g, '_'); }
+
+async function setCaseStatus(section, number) {
+  var val = $('qs-' + escId(number)).value;
+  var r = await api('records', { action: 'set_status', number: number, status: val });
+  if (r.error) { toast(r.error, 'err'); return; }
+  toast('Status updated.', 'ok'); loadSection(section); openCase(section, number);
+}
+
+function toggleLock(section, number, lock) {
+  api('records', { action: lock ? 'lock_case' : 'unlock_case', number: number }).then(function (r) {
+    if (r.error) { toast(r.error, 'err'); return; }
+    toast(lock ? 'Case locked.' : 'Case unlocked.', 'ok');
+    loadSection(section); openCase(section, number);
+  });
+}
+
 function previewKind(f) {
   var t = (f.type || '').toLowerCase();
   var n = (f.name || '').toLowerCase();
@@ -462,10 +505,9 @@ function fileIcon(f) {
   return 'file';
 }
 
-// slot: case_proof | case_documents | staff_documents
-function fileSection(title, slot, ownerId, files, headerIcon) {
+function fileSection(title, slot, ownerId, files, headerIcon, locked) {
   var cards = files.map(function (f) { return fileCardHtml(slot, ownerId, f); }).join('');
-  var uploader = canWrite()
+  var uploader = (canWrite() && !locked)
     ? '<div class="uploader" id="up-' + slot + '" onclick="pickFile(\'' + slot + '\',\'' + esc(ownerId) + '\')">' +
         ic('upload') + ' Click to upload &mdash; or drop files here (any format: audio, video, images, PDF, zip...)' +
         '<div class="progress" id="prog-' + slot + '" style="display:none;"><span></span></div>' +
@@ -497,7 +539,6 @@ function fileCardHtml(slot, ownerId, f) {
   '</div>';
 }
 
-// fetch a short-lived signed URL for a stored file
 async function signedUrl(path, name) {
   var r = await api('uploads', { action: 'sign_download', path: decodeURIComponent(path), name: name ? decodeURIComponent(name) : undefined });
   return r.url || null;
@@ -516,7 +557,6 @@ async function togglePreview(btn, uid, kind, path) {
 }
 
 async function autoPreview(section) {
-  // auto-open image previews (they are cheap), leave audio/video on demand
   var cards = document.querySelectorAll('#' + section + '-detail .filecard[data-kind="image"]');
   for (var i = 0; i < cards.length && i < 6; i++) {
     var card = cards[i];
@@ -537,7 +577,6 @@ async function downloadFile(path, name) {
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-// ---------- upload flow ----------
 function pickFile(slot) { $('fin-' + slot).click(); }
 function onFilePicked(input, slot, ownerId) {
   var files = Array.prototype.slice.call(input.files || []);
@@ -594,7 +633,6 @@ function removeFile(slot, ownerId, path) {
   });
 }
 
-// re-open the record currently shown so file lists refresh
 function refreshCurrentDetail(slot, ownerId) {
   var section = currentSection();
   if (!section) return;
@@ -606,7 +644,6 @@ function currentSection() {
   return (['main', 'inactive', 'revamp', 'archive'].indexOf(name) !== -1) ? name : null;
 }
 
-// drag & drop on uploaders (event delegation)
 document.addEventListener('dragover', function (e) {
   var up = e.target.closest ? e.target.closest('.uploader') : null;
   if (up) { e.preventDefault(); up.classList.add('drag'); }
@@ -625,9 +662,6 @@ document.addEventListener('drop', function (e) {
   if (ownerId) uploadMany(slot, ownerId, Array.prototype.slice.call(e.dataTransfer.files || []));
 });
 
-// ============================================================
-//  ADD / EDIT  STAFF
-// ============================================================
 var lastRobloxId = null;
 function showAddStaff(section) {
   var cat = SECTION_CAT[section];
@@ -727,9 +761,9 @@ function doDeleteStaff(section, id) {
   });
 }
 
-// ============================================================
-//  ADD / EDIT  CASE
-// ============================================================
+var PRIORITY_OPTS = ['Low', 'Medium', 'High', 'Critical'];
+function confSelectOptions() { return CONF_LEVELS.map(function (l) { return { value: l, label: CONF_META[l].label }; }); }
+
 function showAddCase(section) {
   var cat = SECTION_CAT[section];
   var isOld = (cat === 'before_revamp');
@@ -739,10 +773,16 @@ function showAddCase(section) {
       '<div class="field-row"><div><label class="lbl">Subject username *</label><input type="text" id="nc-subname"></div>' +
       '<div><label class="lbl">Subject Discord ID</label><input type="text" id="nc-subid"></div></div>' +
       (isOld ? '<label class="lbl">Roughly when</label><input type="text" id="nc-approx" placeholder="e.g. early 2022">' : '') +
-      '<label class="lbl">Status</label><input type="text" id="nc-status" placeholder="Active / Closed / Expired / On file...">' +
+      '<div class="field-row"><div><label class="lbl">Status</label>' + selectHtml('nc-status', STATUS_OPTIONS, cat === 'active' ? 'Active' : 'On file') + '</div>' +
+      '<div><label class="lbl">Confidentiality</label>' + selectHtml('nc-conf', confSelectOptions(), 'internal') + '</div></div>' +
+      '<div class="field-row"><div><label class="lbl">Department</label><input type="text" id="nc-dept" placeholder="HI / IA / ..."></div>' +
+      '<div><label class="lbl">Priority</label>' + selectHtml('nc-priority', PRIORITY_OPTS, '', 'None') + '</div></div>' +
+      '<label class="lbl">Lead investigator</label><input type="text" id="nc-lead">' +
       '<label class="lbl">What it was about</label><textarea id="nc-matter"></textarea>' +
       '<label class="lbl">Witness / testimony</label><textarea id="nc-testimony"></textarea>' +
+      '<label class="lbl">Outcome / decision</label><textarea id="nc-outcome"></textarea>' +
       '<label class="lbl">Authorized personnel (one per line)</label><textarea id="nc-auth" placeholder="Names, roles or IDs allowed on this case"></textarea>' +
+      '<label class="lbl">Tags (comma separated)</label><input type="text" id="nc-tags" placeholder="raid, alt, priority...">' +
       '<label class="check"><input type="checkbox" id="nc-classified"> Mark classified</label>' +
       '<p class="small">' + ic('info') + ' You can attach proof &amp; documents (audio, video, PDF...) after the case is created.</p>' +
       '<div id="nc-msg"></div>',
@@ -751,11 +791,15 @@ function showAddCase(section) {
   });
 }
 
+function splitTags(v) { return String(v || '').split(/[,\n]/).map(function (x) { return x.trim(); }).filter(Boolean); }
+
 async function submitAddCase(section) {
   var fields = {
     subjectId: $('nc-subid').value, subjectUsername: $('nc-subname').value,
-    status: $('nc-status').value, subjectMatter: $('nc-matter').value,
-    testimony: $('nc-testimony').value, authorizations: $('nc-auth').value,
+    status: $('nc-status').value, confidentiality: $('nc-conf').value,
+    department: $('nc-dept').value, priority: $('nc-priority').value, lead: $('nc-lead').value,
+    subjectMatter: $('nc-matter').value, testimony: $('nc-testimony').value, outcome: $('nc-outcome').value,
+    authorizations: $('nc-auth').value, tags: splitTags($('nc-tags').value),
     classified: $('nc-classified').checked, category: SECTION_CAT[section]
   };
   var approxEl = $('nc-approx'); if (approxEl) fields.approxDate = approxEl.value;
@@ -774,13 +818,17 @@ async function editCase(section, number) {
     body:
       '<div class="field-row"><div><label class="lbl">Subject username</label><input type="text" id="ec-subname" value="' + esc(c.subjectUsername || '') + '"></div>' +
       '<div><label class="lbl">Subject Discord ID</label><input type="text" id="ec-subid" value="' + esc(c.subjectId || '') + '"></div></div>' +
-      '<div class="field-row"><div><label class="lbl">Status</label><input type="text" id="ec-status" value="' + esc(c.status || '') + '"></div>' +
+      '<div class="field-row"><div><label class="lbl">Status</label>' + selectHtml('ec-status', STATUS_OPTIONS.concat(c.status && STATUS_OPTIONS.indexOf(c.status) === -1 ? [c.status] : []), c.status) + '</div>' +
+      '<div><label class="lbl">Confidentiality</label>' + selectHtml('ec-conf', confSelectOptions(), c.confidentiality || 'internal') + '</div></div>' +
+      '<div class="field-row"><div><label class="lbl">Category</label>' + selectHtml('ec-category', ['active', 'inactive', 'before_revamp', 'archived'], c.category) + '</div>' +
+      '<div><label class="lbl">Priority</label>' + selectHtml('ec-priority', PRIORITY_OPTS, c.priority || '', 'None') + '</div></div>' +
+      '<div class="field-row"><div><label class="lbl">Department</label><input type="text" id="ec-dept" value="' + esc(c.department || '') + '"></div>' +
       '<div><label class="lbl">Roughly when</label><input type="text" id="ec-approx" value="' + esc(c.approxDate || '') + '"></div></div>' +
-      '<label class="lbl">Category</label><select id="ec-category">' +
-        ['active', 'inactive', 'before_revamp', 'archived'].map(function (x) { return '<option value="' + x + '"' + (x === c.category ? ' selected' : '') + '>' + x + '</option>'; }).join('') +
-      '</select>' +
+      '<label class="lbl">Lead investigator</label><input type="text" id="ec-lead" value="' + esc(c.lead || '') + '">' +
       '<label class="lbl">Subject matter</label><textarea id="ec-matter">' + esc(c.subjectMatter || '') + '</textarea>' +
       '<label class="lbl">Testimony</label><textarea id="ec-testimony">' + esc(c.testimony || '') + '</textarea>' +
+      '<label class="lbl">Outcome / decision</label><textarea id="ec-outcome">' + esc(c.outcome || '') + '</textarea>' +
+      '<label class="lbl">Tags (comma separated)</label><input type="text" id="ec-tags" value="' + esc((c.tags || []).join(', ')) + '">' +
       '<label class="check"><input type="checkbox" id="ec-classified"' + (c.classified ? ' checked' : '') + '> Classified</label>' +
       '<div id="ec-msg"></div>',
     footer: '<button class="btn ghost" onclick="closeModal()">Cancel</button>' +
@@ -791,8 +839,10 @@ async function editCase(section, number) {
 async function submitEditCase(section, number) {
   var fields = {
     subjectId: $('ec-subid').value, subjectUsername: $('ec-subname').value, status: $('ec-status').value,
-    approxDate: $('ec-approx').value, category: $('ec-category').value,
-    subjectMatter: $('ec-matter').value, testimony: $('ec-testimony').value, classified: $('ec-classified').checked
+    confidentiality: $('ec-conf').value, approxDate: $('ec-approx').value, category: $('ec-category').value,
+    department: $('ec-dept').value, priority: $('ec-priority').value, lead: $('ec-lead').value,
+    subjectMatter: $('ec-matter').value, testimony: $('ec-testimony').value, outcome: $('ec-outcome').value,
+    tags: splitTags($('ec-tags').value), classified: $('ec-classified').checked
   };
   var r = await api('records', { action: 'edit_case', number: number, fields: fields });
   if (r.error) { $('ec-msg').innerHTML = '<div class="msg-err">' + esc(r.error) + '</div>'; return; }
@@ -828,9 +878,6 @@ function doDeleteCase(section, number) {
   });
 }
 
-// ============================================================
-//  EXPORTS  (PDF + Word, styled banner, no proof files inlined)
-// ============================================================
 async function fetchImage(url) {
   try {
     var res = await fetch(url);
@@ -964,9 +1011,6 @@ async function exportListCsv(section) {
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-// ============================================================
-//  GLOBAL SEARCH
-// ============================================================
 async function quickSearch() {
   var v = $('quick-search').value;
   if (!v) return;
@@ -1009,9 +1053,21 @@ function jumpToCase(number, category) {
   setTimeout(function () { setSub(section, 'cases'); openCase(section, number); }, 80);
 }
 
-// ============================================================
-//  ADMIN
-// ============================================================
+async function runSync() {
+  var btn = $('sync-btn'); var res = $('sync-result');
+  if (btn) { btn.disabled = true; btn.innerHTML = ic('history') + ' Syncing...'; }
+  res.innerHTML = '<p class="small">Working... this can take a moment.</p>';
+  var r = await api('admin', { action: 'sync_milweb' });
+  if (btn) { btn.disabled = false; btn.innerHTML = ic('download') + ' Sync now'; }
+  if (!r.ok) { res.innerHTML = '<div class="msg-err">' + esc(r.error || 'Sync failed.') + '</div>'; return; }
+  var d = r.result || {};
+  var notes = (d.notes || []).length ? '<p class="small">' + (d.notes).map(esc).join('<br>') + '</p>' : '';
+  res.innerHTML = '<div class="msg-ok">Sync done.</div>' +
+    '<p class="field">Staff: <b>' + (d.staffAdded || 0) + '</b> added, <b>' + (d.staffUpdated || 0) + '</b> updated &middot; Cases: <b>' + (d.casesAdded || 0) + '</b> imported.</p>' + notes;
+  toast('MilWeb sync complete.', 'ok');
+  loadDashboard();
+}
+
 async function loadAccessList() {
   var r = await api('admin', { action: 'access_list' });
   var el = $('access-list');

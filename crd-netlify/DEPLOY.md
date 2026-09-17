@@ -49,6 +49,35 @@ The bot and the site share the same Supabase project (same `crd_*` tables), so
 - **Reader** (granted via `/crdmanage`): can view everything and **download**
   proof/documents, but cannot add, edit, delete or upload.
 
+## Upgrading / troubleshooting
+
+- **"Could not find the 'documents' column…" when saving:** you added the new
+  columns but PostgREST is serving a stale schema. Re-run `sql/crd-schema.sql`
+  (it ends with `notify pgrst, 'reload schema';`) or click **Reload schema cache**
+  in Supabase → API. The site is also tolerant now and will still save the core
+  record, but the file / confidentiality / lock features need those columns.
+
+## Sync from MilWeb (Dillan)
+
+MilWeb and CRD share the same Supabase project, so CRD can pull straight from it.
+In **Admin → Sync from MilWeb (Dillan)**, click **Sync now** (whitelist only):
+
+- MilWeb staff (`milweb_profiles`) → CRD **Active** (or **Inactive** if their
+  status is retired / fired / blacklisted / suspended, **Before Revamp** if old).
+- MilWeb cases (`cases`) → CRD **Active** (active / awaiting) or **Inactive**
+  (closed / confirmed / expired).
+
+It is idempotent — run it again anytime; synced rows are tagged `source=milweb`.
+
+## Case controls (status / lock / confidentiality)
+
+- **Status**: pick from the dropdown or change it inline with **Quick status**.
+- **Lock**: a locked case is read-only (no edit / delete / archive / upload)
+  until a whitelist member unlocks it.
+- **Confidentiality**: public / internal / restricted / confidential / secret.
+  **Confidential** and **secret** cases are redacted for view-only readers — they
+  see that the case exists but not its content, subject, or files.
+
 ## Assets (icons / logos / banner)
 
 See `ASSETS-YOU-PROVIDE.md`. The site ships with working placeholders; drop your

@@ -66,9 +66,19 @@ create table if not exists crd_cases (
   testimony       text,
   status          text,
   classified      boolean default false,
+  confidentiality text default 'internal',            -- public|internal|restricted|confidential|secret
+  locked          boolean default false,
+  locked_by       text,
+  locked_at       bigint,
+  department      text,
+  lead            text,
+  priority        text,
+  outcome         text,
+  tags            jsonb default '[]'::jsonb,
   proof           jsonb default '[]'::jsonb,          -- evidence files (any format)
   documents       jsonb default '[]'::jsonb,          -- authorization / paperwork files
   authorizations  jsonb default '[]'::jsonb,          -- who is authorized on this case
+  source          text,
   added_by        text,
   created_at      timestamptz default now()
 );
@@ -78,7 +88,23 @@ create index if not exists crd_cases_category_idx on crd_cases (category);
 alter table crd_cases  add column if not exists documents      jsonb default '[]'::jsonb;
 alter table crd_cases  add column if not exists authorizations jsonb default '[]'::jsonb;
 alter table crd_cases  add column if not exists proof          jsonb default '[]'::jsonb;
+alter table crd_cases  add column if not exists locked         boolean default false;
+alter table crd_cases  add column if not exists locked_by      text;
+alter table crd_cases  add column if not exists locked_at      bigint;
+alter table crd_cases  add column if not exists confidentiality text default 'internal';
+alter table crd_cases  add column if not exists department     text;
+alter table crd_cases  add column if not exists lead           text;
+alter table crd_cases  add column if not exists priority       text;
+alter table crd_cases  add column if not exists tags           jsonb default '[]'::jsonb;
+alter table crd_cases  add column if not exists outcome        text;
+alter table crd_cases  add column if not exists source         text;
 alter table crd_staff  add column if not exists documents      jsonb default '[]'::jsonb;
+alter table crd_staff  add column if not exists source         text;
+alter table crd_access add column if not exists username       text;
+
+-- IMPORTANT: after adding columns, reload the PostgREST schema cache so the
+-- API sees them immediately (otherwise you get "Could not find the 'x' column").
+notify pgrst, 'reload schema';
 
 -- ---------- AUDIT (every read/write worth logging) ----------
 create table if not exists crd_audit (

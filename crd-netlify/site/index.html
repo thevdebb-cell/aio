@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- ============ LOGIN (always dark) ============ -->
 <div id="page-login" class="login-wrap">
   <div class="login-box">
     <img src="assets/logo-on-dark.png" alt="NYUC" class="login-logo"
@@ -42,10 +41,8 @@
   </div>
 </div>
 
-<!-- ============ APP ============ -->
 <div id="app" class="app-shell" style="display:none;">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="side-brand" onclick="go('home')">
       <img id="side-logo" src="assets/logo-on-dark.png" alt="" onerror="this.onerror=null;this.src='logo.png';">
@@ -82,7 +79,6 @@
   </aside>
   <div class="scrim" onclick="closeNav()"></div>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <button class="hamburger" onclick="openNav()"><i class="ic" style="--src:url('assets/icons/menu.svg')"></i></button>
@@ -97,7 +93,6 @@
     <div class="scroll">
       <div class="wrap">
 
-        <!-- DASHBOARD -->
         <div id="view-home" class="view">
           <div class="hero">
             <img class="hero-banner" src="assets/banner.png" alt="" onerror="this.style.display='none';">
@@ -114,7 +109,6 @@
           <div id="dash-activity"></div>
         </div>
 
-        <!-- CATEGORY VIEWS -->
         <div id="view-main" class="view" style="display:none;">
           <h2 class="page-title">Main Work</h2>
           <p class="page-sub">Everything currently active.</p>
@@ -151,17 +145,25 @@
           <div id="archive-detail"></div>
         </div>
 
-        <!-- SEARCH -->
         <div id="view-search" class="view" style="display:none;">
           <h2 class="page-title">Search results</h2>
           <p class="page-sub" id="search-sub"></p>
           <div id="search-results"></div>
         </div>
 
-        <!-- ADMIN -->
         <div id="view-admin" class="view" style="display:none;">
           <h2 class="page-title">Admin</h2>
           <p class="page-sub">Owner tools. These actions are recorded.</p>
+
+          <h3 class="sec-title"><i class="ic" style="--src:url('assets/icons/layers.svg')"></i> Sync from MilWeb (Dillan)</h3>
+          <div class="card">
+            <p class="small">Pulls staff and cases from the MilWeb platform (same database). Staff go to <b>Active</b> / <b>Inactive</b> by their status; cases go to <b>Active</b> (active/awaiting) or <b>Inactive</b> (closed/expired). Safe to run again anytime.</p>
+            <div class="actions" style="border-top:none;padding-top:0;margin-top:6px;">
+              <button class="btn primary" id="sync-btn" onclick="runSync()"><i class="ic" style="--src:url('assets/icons/download.svg')"></i> Sync now</button>
+            </div>
+            <div id="sync-result"></div>
+          </div>
+
           <h3 class="sec-title"><i class="ic" style="--src:url('assets/icons/key.svg')"></i> Access granted from Discord</h3>
           <p class="small">Managed only with <b>/crdmanage grant</b> / <b>/crdmanage revoke</b> in the server.</p>
           <div id="access-list"></div>
@@ -175,11 +177,10 @@
   </div>
 </div>
 
-<!-- modal + toast mounts -->
 <div id="modal-root"></div>
 <div class="toasts" id="toasts"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

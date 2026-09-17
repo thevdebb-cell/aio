@@ -1,5 +1,3 @@
-// Shared helper for all CRD functions.
-// The SUPABASE SERVICE KEY lives ONLY here (server side), never in the browser.
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -23,13 +21,11 @@ function json(statusCode, obj) {
   };
 }
 
-// Preflight helper for browsers (functions can call this first).
 function preflight(event) {
   if (event.httpMethod === 'OPTIONS') return json(204, {});
   return null;
 }
 
-// Read the session from a token. Returns the session row or null.
 async function getSession(token) {
   if (!token) return null;
   const { data } = await supabase.from('crd_sessions').select('*').eq('token', token).maybeSingle();
@@ -37,8 +33,6 @@ async function getSession(token) {
   return data;
 }
 
-// Only two levels here: 'whitelist' (full read/write) or 'reader' (view only).
-// Being logged in at all already means the bot authorized this person.
 function levelOf(session) {
   if (!session) return 'none';
   return session.is_whitelist ? 'whitelist' : 'reader';
@@ -55,15 +49,11 @@ async function audit(action, actor, detail) {
   } catch (e) { /* auditing must never break a request */ }
 }
 
-// Roblox avatar helper (headshot) from a roblox user id
 function robloxAvatar(robloxId) {
   if (!robloxId) return null;
   return `https://www.roblox.com/headshot-thumbnail/image?userId=${robloxId}&width=150&height=150&format=png`;
 }
 
-// ---------- Storage: signed upload / download for any file format ----------
-
-// A short-lived signed URL the browser can GET/stream/download.
 async function signedDownloadUrl(path, downloadName) {
   if (!path) return null;
   const opts = downloadName ? { download: downloadName } : undefined;

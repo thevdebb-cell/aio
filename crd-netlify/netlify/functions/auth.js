@@ -1,10 +1,3 @@
-// Login flow (device-code style), same shape as Dillan/MilWeb:
-// 1) browser calls action "start"  -> gets a login code + a token, shows the code
-// 2) user runs /crdauth CODE in Discord -> the bot checks if this person is
-//    authorized (whitelist OR granted access via /crdmanage grant), then either
-//    activates the session or marks it "denied"
-// 3) browser calls action "check"  -> ok / waiting / denied / expired
-// 4) action "me" validates a saved token, "logout" ends the session
 
 const crypto = require('crypto');
 const { supabase, json, preflight } = require('./_common');
