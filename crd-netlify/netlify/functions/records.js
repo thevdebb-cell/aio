@@ -3,7 +3,7 @@ const { supabase, json, preflight, getSession, levelOf, audit, robloxAvatar } = 
 const CATS = ['active', 'inactive', 'before_revamp', 'archived'];
 const CONF_LEVELS = ['public', 'internal', 'restricted', 'confidential', 'secret'];
 const HIDDEN_CONF = ['confidential', 'secret'];
-const OPTIONAL_CASE_KEYS = ['documents', 'proof', 'authorizations', 'tags', 'confidentiality', 'locked', 'locked_by', 'locked_at', 'department', 'lead', 'priority', 'outcome', 'source'];
+const OPTIONAL_CASE_KEYS = ['documents', 'proof', 'authorizations', 'tags', 'confidentiality', 'locked', 'locked_by', 'locked_at', 'department', 'lead', 'priority', 'outcome', 'source', 'subject_staff_id', 'subject_old_position'];
 const OPTIONAL_STAFF_KEYS = ['documents', 'source'];
 
 function isSchemaErr(e) { return e && /could not find|does not exist|schema cache/i.test(e.message || ''); }
@@ -57,7 +57,9 @@ function mapCase(c, isOwner) {
     return Object.assign(base, { subjectUsername: '[Restricted]', redacted: true, proof: [], documents: [], authorizations: [], tags: [] });
   }
   return Object.assign(base, {
-    subjectId: c.subject_id, subjectUsername: c.subject_username, date: c.date_opened,
+    subjectId: c.subject_id, subjectUsername: c.subject_username,
+    subjectStaffId: c.subject_staff_id || null, subjectOldPosition: c.subject_old_position || null,
+    date: c.date_opened,
     approxDate: c.approx_date, subjectMatter: c.subject_matter, testimony: c.testimony,
     lead: c.lead || null, outcome: c.outcome || null,
     lockedBy: c.locked_by || null, lockedAt: c.locked_at || null,
@@ -216,6 +218,7 @@ exports.handler = async (event) => {
     const row = {
       number, category,
       subject_id: f.subjectId || null, subject_username: f.subjectUsername || 'Unknown',
+      subject_staff_id: f.subjectStaffId || null, subject_old_position: f.subjectOldPosition || null,
       date_opened: Math.floor(Date.now() / 1000), approx_date: f.approxDate || null,
       subject_matter: f.subjectMatter || null, testimony: f.testimony || null,
       status: f.status || (category === 'active' ? 'Active' : category === 'inactive' ? 'Expired' : 'On file'),
@@ -239,7 +242,7 @@ exports.handler = async (event) => {
     if (await caseLocked(body.number)) return json(423, { error: 'This case is locked. Unlock it first.' });
     const f = body.fields || {};
     const update = {};
-    ['subject_id', 'subject_username', 'approx_date', 'subject_matter', 'testimony', 'status', 'department', 'lead', 'priority', 'outcome']
+    ['subject_id', 'subject_username', 'subject_staff_id', 'subject_old_position', 'approx_date', 'subject_matter', 'testimony', 'status', 'department', 'lead', 'priority', 'outcome']
       .forEach((k) => { const camel = k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()); if (f[camel] !== undefined) update[k] = f[camel] || null; });
     if (f.category !== undefined && CATS.indexOf(f.category) !== -1) update.category = f.category;
     if (f.classified !== undefined) update.classified = !!f.classified;

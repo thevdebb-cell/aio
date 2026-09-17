@@ -44,6 +44,7 @@ app.get('/api/case/:number', async (req, res) => {
   res.json({
     case: {
       number: data.number, subject: data.subject_username, status: data.status,
+      subjectId: data.subject_id, staffId: data.subject_staff_id, oldPosition: data.subject_old_position,
       department: data.department, date: data.date_opened, matter: data.subject_matter,
       testimony: data.testimony, outcome: data.outcome,
       authorizations: asArr(data.authorizations), files: files

@@ -454,7 +454,14 @@ async function openCase(section, number) {
   }
   head += '</div></div>';
 
-  var html = head +
+  var idInfo = '<div class="card"><h3>' + ic('info') + ' ID &amp; Information</h3>' +
+    '<p class="field"><b>Subject:</b> ' + esc(c.subjectUsername || 'Unknown') + '</p>' +
+    '<p class="field"><b>Subject Discord ID:</b> <span class="mono">' + esc(c.subjectId || '-') + '</span></p>' +
+    (c.subjectStaffId ? '<p class="field"><b>Staff ID:</b> <span class="mono">' + esc(c.subjectStaffId) + '</span></p>' : '') +
+    (c.subjectOldPosition ? '<p class="field"><b>Old position:</b> ' + esc(c.subjectOldPosition) + '</p>' : '') +
+    '</div>';
+
+  var html = head + idInfo +
     '<div class="card"><h3>' + ic('user-check') + ' User Authorization</h3>' +
       '<p class="small">Personnel authorized to handle or view this case.</p>' +
       '<div>' + (auth || '<span class="small">No one recorded.</span>') + '</div>' +
@@ -772,6 +779,8 @@ function showAddCase(section) {
     body:
       '<div class="field-row"><div><label class="lbl">Subject username *</label><input type="text" id="nc-subname"></div>' +
       '<div><label class="lbl">Subject Discord ID</label><input type="text" id="nc-subid"></div></div>' +
+      '<div class="field-row"><div><label class="lbl">Subject staff ID (if staff)</label><input type="text" id="nc-staffid"></div>' +
+      '<div><label class="lbl">Old position</label><input type="text" id="nc-oldpos"></div></div>' +
       (isOld ? '<label class="lbl">Roughly when</label><input type="text" id="nc-approx" placeholder="e.g. early 2022">' : '') +
       '<div class="field-row"><div><label class="lbl">Status</label>' + selectHtml('nc-status', STATUS_OPTIONS, cat === 'active' ? 'Active' : 'On file') + '</div>' +
       '<div><label class="lbl">Confidentiality</label>' + selectHtml('nc-conf', confSelectOptions(), 'internal') + '</div></div>' +
@@ -796,6 +805,7 @@ function splitTags(v) { return String(v || '').split(/[,\n]/).map(function (x) {
 async function submitAddCase(section) {
   var fields = {
     subjectId: $('nc-subid').value, subjectUsername: $('nc-subname').value,
+    subjectStaffId: $('nc-staffid').value, subjectOldPosition: $('nc-oldpos').value,
     status: $('nc-status').value, confidentiality: $('nc-conf').value,
     department: $('nc-dept').value, priority: $('nc-priority').value, lead: $('nc-lead').value,
     subjectMatter: $('nc-matter').value, testimony: $('nc-testimony').value, outcome: $('nc-outcome').value,
@@ -818,6 +828,8 @@ async function editCase(section, number) {
     body:
       '<div class="field-row"><div><label class="lbl">Subject username</label><input type="text" id="ec-subname" value="' + esc(c.subjectUsername || '') + '"></div>' +
       '<div><label class="lbl">Subject Discord ID</label><input type="text" id="ec-subid" value="' + esc(c.subjectId || '') + '"></div></div>' +
+      '<div class="field-row"><div><label class="lbl">Subject staff ID</label><input type="text" id="ec-staffid" value="' + esc(c.subjectStaffId || '') + '"></div>' +
+      '<div><label class="lbl">Old position</label><input type="text" id="ec-oldpos" value="' + esc(c.subjectOldPosition || '') + '"></div></div>' +
       '<div class="field-row"><div><label class="lbl">Status</label>' + selectHtml('ec-status', STATUS_OPTIONS.concat(c.status && STATUS_OPTIONS.indexOf(c.status) === -1 ? [c.status] : []), c.status) + '</div>' +
       '<div><label class="lbl">Confidentiality</label>' + selectHtml('ec-conf', confSelectOptions(), c.confidentiality || 'internal') + '</div></div>' +
       '<div class="field-row"><div><label class="lbl">Category</label>' + selectHtml('ec-category', ['active', 'inactive', 'before_revamp', 'archived'], c.category) + '</div>' +
@@ -838,7 +850,8 @@ async function editCase(section, number) {
 
 async function submitEditCase(section, number) {
   var fields = {
-    subjectId: $('ec-subid').value, subjectUsername: $('ec-subname').value, status: $('ec-status').value,
+    subjectId: $('ec-subid').value, subjectUsername: $('ec-subname').value,
+    subjectStaffId: $('ec-staffid').value, subjectOldPosition: $('ec-oldpos').value, status: $('ec-status').value,
     confidentiality: $('ec-conf').value, approxDate: $('ec-approx').value, category: $('ec-category').value,
     department: $('ec-dept').value, priority: $('ec-priority').value, lead: $('ec-lead').value,
     subjectMatter: $('ec-matter').value, testimony: $('ec-testimony').value, outcome: $('ec-outcome').value,

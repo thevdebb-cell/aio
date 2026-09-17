@@ -60,6 +60,8 @@ create table if not exists crd_cases (
   category        text default 'active',     -- active | inactive | before_revamp | archived
   subject_id      text,
   subject_username text default 'Unknown',
+  subject_staff_id text,
+  subject_old_position text,
   date_opened     bigint,
   approx_date     text,
   subject_matter  text,
@@ -98,6 +100,8 @@ alter table crd_cases  add column if not exists priority       text;
 alter table crd_cases  add column if not exists tags           jsonb default '[]'::jsonb;
 alter table crd_cases  add column if not exists outcome        text;
 alter table crd_cases  add column if not exists source         text;
+alter table crd_cases  add column if not exists subject_staff_id text;
+alter table crd_cases  add column if not exists subject_old_position text;
 alter table crd_staff  add column if not exists documents      jsonb default '[]'::jsonb;
 alter table crd_staff  add column if not exists source         text;
 alter table crd_access add column if not exists username       text;

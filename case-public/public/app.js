@@ -89,6 +89,9 @@ async function showDetail(number) {
   el.innerHTML = '<div class="card">' +
     '<h2><span class="num">' + esc(c.number) + '</span> - ' + esc(c.subject || 'Unknown') + '</h2>' +
     '<p class="field"><b>Status:</b> ' + esc(c.status || 'On file') + '</p>' +
+    (c.subjectId ? '<p class="field"><b>Subject Discord ID:</b> ' + esc(c.subjectId) + '</p>' : '') +
+    (c.staffId ? '<p class="field"><b>Staff ID:</b> ' + esc(c.staffId) + '</p>' : '') +
+    (c.oldPosition ? '<p class="field"><b>Old position:</b> ' + esc(c.oldPosition) + '</p>' : '') +
     (c.department ? '<p class="field"><b>Department:</b> ' + esc(c.department) + '</p>' : '') +
     (c.date ? '<p class="field"><b>Date:</b> ' + esc(fmtDate(c.date)) + '</p>' : '') +
     (c.matter ? '<p class="field"><b>Subject matter:</b> ' + esc(c.matter) + '</p>' : '') +
