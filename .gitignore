@@ -1,0 +1,18 @@
+# Secrets — NEVER commit real tokens / keys
+bot/config.json
+**/config.json
+.env
+.env.*
+
+# Dependencies / build
+node_modules/
+crd-netlify/node_modules/
+
+# Bot runtime data
+bot/data.json
+bot/builder_actions.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

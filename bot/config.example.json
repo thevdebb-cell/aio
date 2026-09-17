@@ -1,0 +1,32 @@
+{
+  "token": "PUT_YOUR_DISCORD_BOT_TOKEN_HERE",
+  "clientId": "PUT_YOUR_APPLICATION_CLIENT_ID_HERE",
+  "guildId": "PUT_YOUR_SERVER_ID_HERE",
+
+  "supabaseUrl": "https://PUT_YOUR_PROJECT.supabase.co",
+  "supabaseKey": "PUT_YOUR_SUPABASE_SERVICE_ROLE_KEY_HERE",
+
+  "whitelist": [
+    "PUT_OWNER_DISCORD_ID",
+    "PUT_SECOND_OWNER_DISCORD_ID"
+  ],
+
+  "dmTargets": [
+    "PUT_OWNER_DISCORD_ID"
+  ],
+
+  "oauthClientSecret": "PUT_OAUTH_CLIENT_SECRET_HERE",
+  "linkedRoleUrl": "https://your-bot-host.example",
+  "linkCode": "1009",
+  "printSecret": "PUT_A_LONG_RANDOM_SECRET_HERE",
+
+  "alertCode": "PUT_A_CODE",
+  "timeoutDurationMs": 604800000,
+
+  "telexFooter": "NYUC Telex & Telegram Only for HI and IA",
+
+  "emojis": {
+    "stop": "🛑",
+    "logo": ""
+  }
+}

@@ -1,0 +1,17 @@
+# Netlify configuration for CRD (Central Record Directory)
+
+[build]
+  publish = "site"
+  functions = "netlify/functions"
+
+# nice URLs: /api/xxx -> the functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# SPA fallback: any unknown path serves the app (which then gates on login)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

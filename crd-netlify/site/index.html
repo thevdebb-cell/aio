@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>CRD - NYUC</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ LOGIN (always dark) ============ -->
+<div id="page-login" class="login-wrap">
+  <div class="login-box">
+    <img src="assets/logo-on-dark.png" alt="NYUC" class="login-logo"
+         onerror="this.onerror=null;this.src='logo.png';this.onerror=function(){this.style.display='none';document.getElementById('logo-text').style.display='block';};">
+    <div id="logo-text" class="logo-text-fallback" style="display:none;">NYUC</div>
+
+    <h1>CENTRAL RECORD DIRECTORY</h1>
+    <p class="sub">Restricted &middot; NYUC</p>
+    <div class="warn">This platform is restricted. Access must be granted by a whitelisted member. Every login attempt is logged.</div>
+
+    <div id="login-idle">
+      <p class="login-label">Your login code</p>
+      <div id="login-code" class="login-code">------</div>
+
+      <label class="remember">
+        <input type="checkbox" id="remember"> Stay connected on this browser
+      </label>
+
+      <div class="tip">Run <b>/crdauth <span id="tip-code">code</span></b> in the server to log in.</div>
+      <div id="login-status" class="login-status"><span class="spinner"></span> Waiting for authorization...</div>
+    </div>
+
+    <div id="login-denied" style="display:none;">
+      <div class="denied-box">NO AUTHORIZATION</div>
+      <p class="login-status">This Discord account has not been granted access to CRD. Ask a whitelisted member to run <b>/crdmanage grant</b> for you, then try again.</p>
+      <button class="btn ghost" style="margin-top:14px;" onclick="location.reload()">Try again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="app-shell" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-brand" onclick="go('home')">
+      <img id="side-logo" src="assets/logo-on-dark.png" alt="" onerror="this.onerror=null;this.src='logo.png';">
+      <div>
+        <span class="bn">CRD</span>
+        <span class="bs">Central Record Directory</span>
+      </div>
+    </div>
+
+    <nav class="side-nav" id="side-nav">
+      <a id="nav-home" onclick="go('home')"><i class="ic" style="--src:url('assets/icons/dashboard.svg')"></i> Dashboard</a>
+      <a id="nav-main" onclick="go('main')"><i class="ic" style="--src:url('assets/icons/briefcase.svg')"></i> Main Work</a>
+      <a id="nav-inactive" onclick="go('inactive')"><i class="ic" style="--src:url('assets/icons/user-clock.svg')"></i> Inactive</a>
+      <a id="nav-revamp" onclick="go('revamp')"><i class="ic" style="--src:url('assets/icons/scroll.svg')"></i> Before Revamp</a>
+      <a id="nav-archive" onclick="go('archive')"><i class="ic" style="--src:url('assets/icons/archive.svg')"></i> Archive</a>
+      <div class="side-sep"></div>
+      <a id="nav-admin" onclick="go('admin')" style="display:none;"><i class="ic" style="--src:url('assets/icons/shield.svg')"></i> Admin</a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <span style="display:flex;align-items:center;gap:8px;"><i class="ic" id="theme-ic" style="--src:url('assets/icons/moon.svg')"></i> <span id="theme-label">Dark</span></span>
+        <span class="small">switch</span>
+      </div>
+      <div class="user-chip">
+        <div class="av" id="user-av">?</div>
+        <div style="min-width:0;">
+          <div class="un" id="user-name">-</div>
+          <div class="ur" id="user-role">-</div>
+        </div>
+      </div>
+      <button class="btn ghost" onclick="logout()"><i class="ic" style="--src:url('assets/icons/logout.svg')"></i> Logout</button>
+    </div>
+  </aside>
+  <div class="scrim" onclick="closeNav()"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="openNav()"><i class="ic" style="--src:url('assets/icons/menu.svg')"></i></button>
+      <div class="tb-title" id="tb-title">Dashboard</div>
+      <div class="grow"></div>
+      <div class="search-box">
+        <i class="ic" style="--src:url('assets/icons/search.svg')"></i>
+        <input type="text" id="quick-search" class="search-input" placeholder="Search staff & cases..." onkeydown="if(event.key==='Enter')quickSearch()">
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="wrap">
+
+        <!-- DASHBOARD -->
+        <div id="view-home" class="view">
+          <div class="hero">
+            <img class="hero-banner" src="assets/banner.png" alt="" onerror="this.style.display='none';">
+            <div class="hero-body">
+              <h2>Central Record Directory</h2>
+              <p id="hello-line">NY:RP staff &amp; case directory - all-time record.</p>
+            </div>
+          </div>
+          <div class="banner"><i class="ic" style="--src:url('assets/icons/eye.svg')"></i> Every read and write on CRD is logged and attributed.</div>
+          <div class="stats" id="dash-stats"></div>
+          <h3 class="sec-title"><i class="ic" style="--src:url('assets/icons/layers.svg')"></i> Categories</h3>
+          <div class="tiles" id="dash-tiles"></div>
+          <div id="dash-recent"></div>
+          <div id="dash-activity"></div>
+        </div>
+
+        <!-- CATEGORY VIEWS -->
+        <div id="view-main" class="view" style="display:none;">
+          <h2 class="page-title">Main Work</h2>
+          <p class="page-sub">Everything currently active.</p>
+          <div class="subtabs" id="main-subtabs"></div>
+          <div class="toolbar" id="main-toolbar"></div>
+          <div id="main-list"></div>
+          <div id="main-detail"></div>
+        </div>
+
+        <div id="view-inactive" class="view" style="display:none;">
+          <h2 class="page-title">Inactive</h2>
+          <p class="page-sub">Retired staff and expired / inactive cases.</p>
+          <div class="subtabs" id="inactive-subtabs"></div>
+          <div class="toolbar" id="inactive-toolbar"></div>
+          <div id="inactive-list"></div>
+          <div id="inactive-detail"></div>
+        </div>
+
+        <div id="view-revamp" class="view" style="display:none;">
+          <h2 class="page-title">Before Revamp</h2>
+          <p class="page-sub">Historical profiles and cases, from the founding of NYUC onward.</p>
+          <div class="subtabs" id="revamp-subtabs"></div>
+          <div class="toolbar" id="revamp-toolbar"></div>
+          <div id="revamp-list"></div>
+          <div id="revamp-detail"></div>
+        </div>
+
+        <div id="view-archive" class="view" style="display:none;">
+          <h2 class="page-title">Archive</h2>
+          <p class="page-sub">Classified, closed-out records. Cases can be exported as PDF or Word.</p>
+          <div class="subtabs" id="archive-subtabs"></div>
+          <div class="toolbar" id="archive-toolbar"></div>
+          <div id="archive-list"></div>
+          <div id="archive-detail"></div>
+        </div>
+
+        <!-- SEARCH -->
+        <div id="view-search" class="view" style="display:none;">
+          <h2 class="page-title">Search results</h2>
+          <p class="page-sub" id="search-sub"></p>
+          <div id="search-results"></div>
+        </div>
+
+        <!-- ADMIN -->
+        <div id="view-admin" class="view" style="display:none;">
+          <h2 class="page-title">Admin</h2>
+          <p class="page-sub">Owner tools. These actions are recorded.</p>
+          <h3 class="sec-title"><i class="ic" style="--src:url('assets/icons/key.svg')"></i> Access granted from Discord</h3>
+          <p class="small">Managed only with <b>/crdmanage grant</b> / <b>/crdmanage revoke</b> in the server.</p>
+          <div id="access-list"></div>
+          <h3 class="sec-title"><i class="ic" style="--src:url('assets/icons/history.svg')"></i> Audit log</h3>
+          <div id="audit-list"></div>
+        </div>
+
+        <div class="footer">Central Record Directory (NYUC) &middot; crd.nyuc.app &middot; internal use only</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal + toast mounts -->
+<div id="modal-root"></div>
+<div class="toasts" id="toasts"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
