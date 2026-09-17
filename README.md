@@ -17,6 +17,18 @@ Access is gated by the Discord bot: `/crdauth` to log in, `/crdmanage` to grant
 access. Nothing sensitive is ever in the page source — records come from the
 functions after a server-side token check.
 
+## `case-public/` — public site (case.nyuc.app)
+A tiny Express app for the VPS that shows only **declassified** cases
+(`confidentiality = public`) with their downloadable documents. Nothing sensitive
+reaches the browser; the Supabase service key stays in the server `.env`. Deploy
+guide (DNS + Caddy + NSSM, OVH/Windows): `case-public/DEPLOY-VPS.md`.
+
+## Real-time auto-sync
+`crd-netlify/sql/crd-autosync.sql` installs Postgres triggers so that a case or
+staff profile created/updated on MilWeb **or** by the bot is mirrored into CRD
+automatically (no manual "Sync now"). Synced cases default to `internal` and only
+appear on the public site once declassified in CRD.
+
 ## `bot/` — Discord bot changes
 The `/crdmanage` command (grant / revoke / list CRD access) added to the existing
 NYUC bot. Only `index.js` + `deploy-commands.js` changed. See `bot/BOT-CHANGES.md`.

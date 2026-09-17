@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NYUC Public Records</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="header-in">
+      <div class="brand">NYUC <span>PUBLIC RECORD DIRECTORY</span></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="notice">
+      These are <b>declassified</b> records made public by the NYUC Higher Inspection.
+      Classified and internal cases are not shown here.
+    </div>
+
+    <div id="view-list">
+      <h1>Public cases</h1>
+      <input type="text" id="search" class="search" placeholder="Filter by number, subject or matter...">
+      <div id="list" class="list"></div>
+    </div>
+
+    <div id="view-detail" style="display:none;">
+      <a class="back" onclick="go('')">&larr; Back to all cases</a>
+      <div id="detail"></div>
+    </div>
+
+    <div class="footer">NYUC Public Record Directory &middot; case.nyuc.app</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
