@@ -3,35 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NYUC Public Records</title>
+  <title>Public Case</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="header">
-    <div class="header-in">
-      <div class="brand">NYUC <span>PUBLIC RECORD DIRECTORY</span></div>
-    </div>
-  </div>
+  <header>
+    <img src="logo.png" alt="" class="logo" onerror="this.style.display='none';">
+    <h1>Public Case</h1>
+    <p class="tag-line">Public, declassified case records. Check someone before you let them in your RP.</p>
+  </header>
 
-  <div class="wrap">
-    <div class="notice">
-      These are <b>declassified</b> records made public by the NYUC Higher Inspection.
-      Classified and internal cases are not shown here.
-    </div>
-
+  <main>
     <div id="view-list">
-      <h1>Public cases</h1>
-      <input type="text" id="search" class="search" placeholder="Filter by number, subject or matter...">
-      <div id="list" class="list"></div>
+      <input type="text" id="search" placeholder="Search a number, name or subject...">
+      <div id="list"></div>
     </div>
 
     <div id="view-detail" style="display:none;">
-      <a class="back" onclick="go('')">&larr; Back to all cases</a>
+      <a class="back" onclick="go('')">&larr; Back</a>
       <div id="detail"></div>
     </div>
+  </main>
 
-    <div class="footer">NYUC Public Record Directory &middot; case.nyuc.app</div>
-  </div>
+  <footer>case sorti</footer>
 
   <script src="app.js"></script>
 </body>
