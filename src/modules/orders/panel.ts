@@ -18,7 +18,7 @@ import {
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { onSelect, onModal, cid } from "../../lib/interactions.js";
-import { container, text, separator, banner, bannerFiles, bannerExists, ASSETS_DIR } from "../../lib/ui.js";
+import { container, text, separator, banner, bannerFiles, bannerExists, e, ASSETS_DIR } from "../../lib/ui.js";
 import { config } from "../../config/config.js";
 import { store, newOrderId } from "../../lib/store/store.js";
 import type { OrderTicketType } from "../../types/types.js";
@@ -35,11 +35,39 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
 
   const c = container();
   if (bannerExists(config.banners.orderTop)) c.addMediaGalleryComponents(banner(config.banners.orderTop));
-  c.addTextDisplayComponents(text("## Services Panel"));
-  c.addSeparatorComponents(separator());
+
+  c.addTextDisplayComponents(
+    text("# Star Customs — Services"),
+    text(
+      "Welcome to the **Star Customs** order desk. We bring your ideas to life — clean, " +
+        "professional and on time. Check the live status of each service below, then open " +
+        "an order and tell us exactly what you need.",
+    ),
+  );
+  c.addSeparatorComponents(separator(true));
+
   c.addTextDisplayComponents(text("## Order Status"), text(services.map(statusLine).join("\n")));
+  c.addSeparatorComponents(separator(true));
+
+  // Status legend (uses your wifi emojis when set)
+  const legend = [
+    `${e(config.emojis.wifiOnline)} **Online** — available to order now`,
+    `${e(config.emojis.wifiDelayed)} **Delayed** — orderable, but may take a little longer`,
+    `${e(config.emojis.wifiOffline)} **Offline** — temporarily closed, try again later`,
+    `${e(config.emojis.wifiDev)} **Unavailable** — not offered right now`,
+  ].map((l) => l.trimStart());
+  c.addTextDisplayComponents(text("## Legend"), text(legend.join("\n")));
+  c.addSeparatorComponents(separator(true));
+
+  c.addTextDisplayComponents(
+    text("## How To Order"),
+    text(
+      "Pick a service in the menu below and fill in the short form (add your references — " +
+        "especially for graphics). A private order channel is created for you, a designer " +
+        "claims it, and everything is tracked with a unique order ID from start to delivery.",
+    ),
+  );
   c.addSeparatorComponents(separator());
-  c.addTextDisplayComponents(text("Select a service below to open an order."));
 
   const options = services
     .filter((s) => STATUS[s.status].selectable)
@@ -51,7 +79,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
     new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId(cid("order", "open"))
-        .setPlaceholder("Select an order category")
+        .setPlaceholder("Select a service to open an order")
         .addOptions(options.length ? options : [new StringSelectMenuOptionBuilder().setLabel("No services available").setValue("none")]),
     ),
   );

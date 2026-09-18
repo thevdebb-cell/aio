@@ -44,16 +44,46 @@ function metaFor(value: string): CatMeta | undefined {
 export function buildSupportPanel(): { components: [ReturnType<typeof container>]; files: AttachmentBuilder[] } {
   const c = container();
   if (bannerExists(config.banners.assistanceTop)) c.addMediaGalleryComponents(banner(config.banners.assistanceTop));
+
   c.addTextDisplayComponents(
-    text("## Assistance"),
-    text("Need a hand? Open a ticket below and the team will get back to you."),
+    text("# Star Customs — Assistance"),
+    text(
+      "Welcome to the **Star Customs** support desk. Whatever you need — a question, " +
+        "help with an order, reaching management, or reporting an issue — open a ticket " +
+        "below and a member of the team will take care of you as soon as possible.",
+    ),
+  );
+  c.addSeparatorComponents(separator(true));
+
+  c.addTextDisplayComponents(
+    text("## Support Categories"),
+    text(
+      [
+        "**General Support** — questions, information, and anything that doesn't fit elsewhere.",
+        "**Order Support** — help with an existing order (give your Order ID if you have one).",
+        "**High Rank Support** — reach the management team directly for sensitive matters.",
+        "**Report** — report a user, a staff member, or a problem on the server.",
+        "**Bug Report** — tell us about a bug so we can fix it.",
+      ].join("\n\n"),
+    ),
+  );
+  c.addSeparatorComponents(separator(true));
+
+  c.addTextDisplayComponents(
+    text("## How It Works"),
+    text(
+      "Pick a category in the menu below and fill in the short form. A private channel is " +
+        "created just for you and the team. Please stay patient and avoid pinging staff — " +
+        "you'll be notified the moment your ticket is claimed.",
+    ),
   );
   c.addSeparatorComponents(separator());
+
   c.addActionRowComponents(
     new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId(cid("support", "open"))
-        .setPlaceholder("Select a support category")
+        .setPlaceholder("Select a support category to open a ticket")
         .addOptions(
           CATEGORIES.map((cat) =>
             new StringSelectMenuOptionBuilder().setLabel(cat.label).setDescription(cat.description).setValue(cat.value),
