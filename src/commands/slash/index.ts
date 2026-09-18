@@ -6,5 +6,6 @@ import { orderinfo } from "./orderinfo.js";
 import { sendimage } from "./sendimage.js";
 import { submit } from "./submit.js";
 import { order } from "./order.js";
+import { dispute } from "./dispute.js";
 
-export const slashCommands: SlashCommand[] = [say, ticket, closerequest, orderinfo, sendimage, submit, order];
+export const slashCommands: SlashCommand[] = [say, ticket, closerequest, orderinfo, sendimage, submit, order, dispute];

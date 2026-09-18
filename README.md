@@ -31,12 +31,28 @@ control, anti-nuke/raid, moderation, welcome, and more.
 - **Owner/WL**: `!setup`, `!sendsupportpanel`, `!sendorderpanel`,
   `!supporton` / `!supportoff`, `!prefixlogs`, `!service`, `/say`.
 
-## Coming next (phase 2+)
+### Order pipeline (phase 2 — done)
 
-Order delivery pipeline (`/sendimage` with watermark, `/submit`, quality
-control approval, download links, ratings & disputes), infractions/promotions,
-AFK, Bloxlink verification, auto-role, full moderation commands. See
-[ROADMAP](#roadmap).
+- **`/sendimage`** — designers post in-ticket previews, auto-watermarked
+  (transparent PNGs flattened onto a background + tiled semi-transparent
+  "STAR CUSTOMS" overlay). Raw image/file posts in order tickets are blocked.
+- **`/submit file|zip|link|id`** → **Quality Control** channel (Approve/Reject).
+- **Approve → delivery**: expiring download link, "order ready" DM (link +
+  Regen link + Confirm my order + Open a dispute) and a ready message with
+  Jump-to-DMs / Help buttons in the ticket.
+- **Help** flow (DMs closed / other) → opens an order support ticket; High Rank
+  delivers with **`/order <id>`**.
+- **Reviews**: stars + optional comment, public or anonymous; public go to the
+  reviews channel, `!rateslogs` shows the full unmasked list (WL only).
+- **Confirm my order**: double-confirm DM; after confirming, review is offered.
+- **Disputes**: available 12h after delivery (blocked once confirmed) — locks
+  the ticket, transcripts it to the disputes channel; **`/dispute verdict`**
+  (High Rank) rules and notifies both sides.
+
+## Coming next (phase 3+)
+
+Infractions/promotions, AFK, Bloxlink verification, auto-role, full moderation
+commands. See [ROADMAP](#roadmap).
 
 ---
 
@@ -80,6 +96,7 @@ Prefix: `!` — slash: `/`
 | Command | Description |
 | --- | --- |
 | `!service <service> <on\|delay\|closed\|unavail>` | Set a service status |
+| `!rateslogs` | Full unmasked review log |
 | `/say <message> [channel]` | Send a message as the bot |
 
 `!service` statuses: `on` → Online (green), `delay` → Delayed (yellow),
@@ -94,13 +111,17 @@ Prefix: `!` — slash: `/`
 | `!supporton` / `!supportoff` | Toggle support ticket creation |
 | `!prefixlogs` | Recent `!` commands run by staff |
 
-### Tickets (slash)
+### Tickets & orders (slash)
 | Command | Access | Description |
 | --- | --- | --- |
 | `/ticket add <user>` | ticket staff | Add a user to the current ticket |
 | `/ticket escalated <section>` | ticket staff | Escalate the ticket to another section |
 | `/closerequest` | ticket staff | Ask the opener to approve closing |
 | `/orderinfo <id>` | staff | Look up an order by ID |
+| `/sendimage <file>` | designer | Post a watermarked preview in an order ticket |
+| `/submit file\|zip\|link\|id` | designer | Submit a deliverable to Quality Control |
+| `/order <id>` | High Rank | (Re)deliver an order to its buyer |
+| `/dispute verdict <id> <winner>` | High Rank | Rule on a dispute |
 
 ---
 
@@ -178,16 +199,17 @@ create table prefix_logs  (id bigint generated always as identity primary key, d
 
 ## Roadmap
 
-- [ ] `/sendimage` (designers only, in-ticket) with anti-theft watermark on
-      transparent PNGs (needs `sharp` + `watermark.png`).
-- [ ] `/submit` (file / zip / link / id), quality-control channel approval,
-      "order ready" DM with Jump-to-DMs + Help buttons.
-- [ ] Download links via Supabase signed URLs (10-min expiry) + regen button.
-- [ ] Ratings (public/anonymous) + `!rateslogs`, order confirmation flow,
-      disputes (12h lock, transcript to dispute channel, verdict + sanctions).
+- [x] `/sendimage` with anti-theft watermark + order-ticket media guard.
+- [x] `/submit` (file/zip/link/id), quality-control approval, "order ready" DM.
+- [x] Expiring download links (local server or Supabase signed URLs) + regen.
+- [x] Reviews (public/anonymous) + `!rateslogs`, confirmation flow, disputes.
 - [ ] `/promotion issue`, `/infraction issue` (staff + designer).
 - [ ] Moderation suite + AFK.
 - [ ] Bloxlink verification + auto-role.
+
+Optional assets: `assets/art_bg.png` (background used behind transparent
+delivery previews) and `assets/watermark.png` (unused — the watermark is
+generated from text; add only if you want a custom logo overlay later).
 
 ---
 

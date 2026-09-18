@@ -54,6 +54,7 @@ function readyDmComponents(order: OrderRecord, dl: { label: string; url: string 
   if (dl.url) row.addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(dl.label).setURL(dl.url));
   if (dl.url) row.addComponents(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel("Regen link").setCustomId(cid("orderdl", "regen", order.id)));
   row.addComponents(new ButtonBuilder().setStyle(ButtonStyle.Success).setLabel("Confirm my order").setCustomId(cid("orderconfirm", "start", order.id)));
+  row.addComponents(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel("Open a dispute").setCustomId(cid("orderdispute", "open", order.id)));
 
   return { components: [c, row] as const, files: attachFiles };
 }

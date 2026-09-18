@@ -63,6 +63,7 @@ const setup: PrefixCommand = {
     await ensureStaffChannel(guild, settings, CHANNEL.qc, "quality-control", [settings.roles[ROLE.qc], settings.roles[ROLE.highrank]].filter(Boolean) as string[], created);
     await ensureStaffChannel(guild, settings, CHANNEL.dispute, "disputes", [settings.roles[ROLE.highrank]].filter(Boolean) as string[], created);
     await ensureStaffChannel(guild, settings, CHANNEL.transcripts, "transcripts", staffAllow, created);
+    await ensureStaffChannel(guild, settings, CHANNEL.reviews, "reviews", staffAllow, created);
 
     // Quarantine channel + lockdown for the quarantine role.
     const qRole = settings.roles[ROLE.quarantine];

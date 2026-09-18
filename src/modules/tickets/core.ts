@@ -38,6 +38,7 @@ export const CHANNEL = {
   orderLogs: "order_logs",
   qc: "quality_control",
   dispute: "dispute",
+  reviews: "reviews",
   quarantine: "quarantine",
   transcripts: "transcripts",
   ticketCategory: "ticket_category",
