@@ -1,5 +1,5 @@
 import { ChannelType, type Guild, type TextChannel } from "discord.js";
-import { store, newId } from "../../lib/store/index.js";
+import { store, newId } from "../../lib/store/store.js";
 import type { ModRecord, ModRecordType } from "../../lib/store/types.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
 import { CHANNEL } from "../tickets/core.js";

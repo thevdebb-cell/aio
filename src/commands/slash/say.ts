@@ -1,6 +1,6 @@
 import { ChannelType, SlashCommandBuilder, type TextChannel } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { isWhitelisted } from "../../config/index.js";
+import { isWhitelisted } from "../../config/config.js";
 
 export const say: SlashCommand = {
   data: new SlashCommandBuilder()

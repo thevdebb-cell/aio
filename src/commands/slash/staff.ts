@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import { ROLE } from "../../modules/tickets/core.js";
 import { memberHasAnyRole } from "../../modules/tickets/handlers.js";
 import { recordAndLog } from "../../modules/moderation/util.js";

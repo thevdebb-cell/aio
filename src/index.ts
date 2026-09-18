@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { createClient } from "./lib/client.js";
-import { initStore } from "./lib/store/index.js";
-import { initFileStore } from "./lib/files/index.js";
-import { slashCommands } from "./commands/slash/index.js";
-import { events } from "./events/index.js";
+import { initStore } from "./lib/store/store.js";
+import { initFileStore } from "./lib/files/files.js";
+import { slashCommands } from "./commands/slash/registry.js";
+import { events } from "./events/registry.js";
 import { deployCommands } from "./lib/deploy.js";
 import { log } from "./lib/logger.js";
 // Side-effect import: registers all button/select/modal handlers.
-import "./modules/index.js";
+import "./modules/register.js";
 
 async function main() {
   const token = process.env.DISCORD_TOKEN;

@@ -1,5 +1,5 @@
 import { ChannelType, type Message } from "discord.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 
 /**
  * In order tickets, nobody may post raw images/files — designers must use

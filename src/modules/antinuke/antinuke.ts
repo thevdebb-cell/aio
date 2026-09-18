@@ -10,8 +10,8 @@ import {
   OverwriteType,
   PermissionFlagsBits,
 } from "discord.js";
-import { isWhitelisted, isOwner } from "../../config/index.js";
-import { store } from "../../lib/store/index.js";
+import { isWhitelisted, isOwner } from "../../config/config.js";
+import { store } from "../../lib/store/store.js";
 import { ROLE, CHANNEL } from "../tickets/core.js";
 import { log } from "../../lib/logger.js";
 

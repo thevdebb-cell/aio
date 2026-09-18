@@ -5,9 +5,9 @@ import {
   type TextChannel,
 } from "discord.js";
 import { onButton } from "../../lib/interactions.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import type { GuildSettings, TicketRecord } from "../../lib/store/types.js";
-import { isOwner } from "../../config/index.js";
+import { isOwner } from "../../config/config.js";
 import { log } from "../../lib/logger.js";
 import {
   ROLE,

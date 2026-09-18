@@ -12,15 +12,15 @@ import {
 } from "discord.js";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { store } from "../../lib/store/index.js";
-import { files, linkTtlSeconds } from "../../lib/files/index.js";
+import { store } from "../../lib/store/store.js";
+import { files, linkTtlSeconds } from "../../lib/files/files.js";
 import { siteEnabled, buildSiteLink } from "../../lib/files/site-link.js";
-import { config } from "../../config/index.js";
+import { config } from "../../config/config.js";
 import { container, text, ASSETS_DIR } from "../../lib/ui.js";
 import { cid } from "../../lib/interactions.js";
 import { V2 } from "../tickets/core.js";
 import { log } from "../../lib/logger.js";
-import type { OrderRecord, Submission } from "../../types/index.js";
+import type { OrderRecord, Submission } from "../../types/types.js";
 
 export function latestApproved(order: OrderRecord): Submission | null {
   const approved = order.submissions.filter((s) => s.approved);

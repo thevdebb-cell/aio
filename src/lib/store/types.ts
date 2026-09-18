@@ -1,4 +1,4 @@
-import type { OrderRecord, ServiceStatus, SupportCategory, OrderTicketType } from "../../types/index.js";
+import type { OrderRecord, ServiceStatus, SupportCategory, OrderTicketType } from "../../types/types.js";
 
 /** Per-guild settings, mostly filled by !setup. */
 export interface GuildSettings {

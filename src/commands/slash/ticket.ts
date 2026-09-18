@@ -1,6 +1,6 @@
 import { ChannelType, SlashCommandBuilder, type TextChannel } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
 import {
   ROLE,
@@ -10,7 +10,7 @@ import {
   ticketControls,
 } from "../../modules/tickets/core.js";
 import { memberHasAnyRole, staffRoleKeysFor } from "../../modules/tickets/handlers.js";
-import type { SupportCategory } from "../../types/index.js";
+import type { SupportCategory } from "../../types/types.js";
 
 const SUPPORT_PREFIX: Record<string, string> = {
   general: "general",

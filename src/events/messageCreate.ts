@@ -1,10 +1,10 @@
 import { Events, type Message } from "discord.js";
 import { defineEvent, PREFIX } from "../lib/framework.js";
-import { prefixLookup } from "../commands/prefix/index.js";
-import { isOwner, isWhitelisted } from "../config/index.js";
-import { store } from "../lib/store/index.js";
+import { prefixLookup } from "../commands/prefix/registry.js";
+import { isOwner, isWhitelisted } from "../config/config.js";
+import { store } from "../lib/store/store.js";
 import { enforceOrderMedia } from "../modules/orders/media-guard.js";
-import { handleAfkMessage } from "../modules/afk/index.js";
+import { handleAfkMessage } from "../modules/afk/afk.js";
 import { log } from "../lib/logger.js";
 
 export default defineEvent({

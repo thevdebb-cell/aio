@@ -1,6 +1,6 @@
 import { Events, type DMChannel, type NonThreadGuildBasedChannel } from "discord.js";
 import { defineEvent } from "../lib/framework.js";
-import { onChannelCreate, onChannelDelete, onChannelUpdate } from "../modules/antinuke/index.js";
+import { onChannelCreate, onChannelDelete, onChannelUpdate } from "../modules/antinuke/antinuke.js";
 
 export const channelCreateEvent = defineEvent({
   name: Events.ChannelCreate,

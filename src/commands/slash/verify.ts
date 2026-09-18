@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { verifyMember } from "../../modules/verification/index.js";
+import { verifyMember } from "../../modules/verification/verification.js";
 
 export const verify: SlashCommand = {
   data: new SlashCommandBuilder().setName("verify").setDescription("Verify your Roblox account via Bloxlink"),

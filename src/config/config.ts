@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import type { Config } from "../types/index.js";
+import type { Config } from "../types/types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

@@ -8,7 +8,7 @@ import {
   type Guild,
   type TextChannel,
 } from "discord.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import { onButton, cid } from "../../lib/interactions.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
 const V2 = V2FLAG;

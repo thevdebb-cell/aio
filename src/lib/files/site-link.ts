@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { linkTtlSeconds } from "./index.js";
+import { linkTtlSeconds } from "./files.js";
 
 /** True when a Netlify download site is configured. */
 export function siteEnabled(): boolean {

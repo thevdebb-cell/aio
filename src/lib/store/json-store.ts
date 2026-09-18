@@ -1,6 +1,6 @@
 import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync } from "node:fs";
 import { join } from "node:path";
-import type { OrderRecord } from "../../types/index.js";
+import type { OrderRecord } from "../../types/types.js";
 import { log } from "../logger.js";
 import {
   type Store,

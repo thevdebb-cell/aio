@@ -1,6 +1,6 @@
-import { config, serviceByKey } from "../../config/index.js";
+import { config, serviceByKey } from "../../config/config.js";
 import type { GuildSettings } from "../../lib/store/types.js";
-import type { ServiceDef, ServiceStatus } from "../../types/index.js";
+import type { ServiceDef, ServiceStatus } from "../../types/types.js";
 import { e } from "../../lib/ui.js";
 
 export interface StatusMeta {

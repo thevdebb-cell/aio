@@ -1,5 +1,5 @@
 import type { GuildMember } from "discord.js";
-import { config } from "../../config/index.js";
+import { config } from "../../config/config.js";
 import { log } from "../../lib/logger.js";
 
 /** Assign the configured auto-roles to a member on join. */

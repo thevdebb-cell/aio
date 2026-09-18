@@ -17,7 +17,7 @@ import { join } from "node:path";
 import type { GuildSettings, TicketRecord } from "../../lib/store/types.js";
 import { cid } from "../../lib/interactions.js";
 import { container, text, e, ASSETS_DIR } from "../../lib/ui.js";
-import { config } from "../../config/index.js";
+import { config } from "../../config/config.js";
 import { log } from "../../lib/logger.js";
 
 /** All Components V2 messages carry this flag. */

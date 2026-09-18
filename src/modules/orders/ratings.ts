@@ -14,10 +14,10 @@ import {
   type TextChannel,
   type Guild,
 } from "discord.js";
-import { store, newId } from "../../lib/store/index.js";
+import { store, newId } from "../../lib/store/store.js";
 import { onButton, onSelect, onModal, cid } from "../../lib/interactions.js";
 import { container, text, V2FLAG, e } from "../../lib/ui.js";
-import { config } from "../../config/index.js";
+import { config } from "../../config/config.js";
 import { CHANNEL, V2 } from "../tickets/core.js";
 import { log } from "../../lib/logger.js";
 

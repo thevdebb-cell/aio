@@ -1,7 +1,7 @@
 import type { PrefixCommand } from "../../lib/framework.js";
 import { out } from "../../lib/msg.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import { starsText } from "../../modules/orders/ratings.js";
 
 /** WL-only: full, unmasked review log (shows the buyer even for anonymous reviews). */

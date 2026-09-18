@@ -1,5 +1,5 @@
 import { REST, Routes } from "discord.js";
-import { slashCommands } from "../commands/slash/index.js";
+import { slashCommands } from "../commands/slash/registry.js";
 import { log } from "./logger.js";
 
 /**

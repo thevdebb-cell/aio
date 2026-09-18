@@ -1,6 +1,6 @@
 import { ChannelType, SlashCommandBuilder, type TextChannel, AttachmentBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { store } from "../../lib/store/index.js";
+import { store } from "../../lib/store/store.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
 import { ROLE } from "../../modules/tickets/core.js";
 import { memberHasAnyRole } from "../../modules/tickets/handlers.js";

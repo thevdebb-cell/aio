@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { store } from "../../lib/store/index.js";
-import { isOwner } from "../../config/index.js";
+import { store } from "../../lib/store/store.js";
+import { isOwner } from "../../config/config.js";
 import { ROLE } from "../../modules/tickets/core.js";
 import { deliverOrder, latestApproved } from "../../modules/orders/delivery.js";
 

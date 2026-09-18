@@ -12,7 +12,7 @@ import {
 } from "discord.js";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { config } from "../../config/index.js";
+import { config } from "../../config/config.js";
 import { container, text, separator, e, ASSETS_DIR } from "../../lib/ui.js";
 import { V2 } from "../tickets/core.js";
 import { log } from "../../lib/logger.js";

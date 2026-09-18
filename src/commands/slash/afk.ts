@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../../lib/framework.js";
-import { setAfk } from "../../modules/afk/index.js";
+import { setAfk } from "../../modules/afk/afk.js";
 
 export const afk: SlashCommand = {
   data: new SlashCommandBuilder()

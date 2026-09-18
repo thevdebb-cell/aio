@@ -13,9 +13,9 @@ import {
 } from "discord.js";
 import { onSelect, onModal, cid } from "../../lib/interactions.js";
 import { container, text, separator, banner, bannerFiles, e } from "../../lib/ui.js";
-import { config } from "../../config/index.js";
-import { store } from "../../lib/store/index.js";
-import type { SupportCategory } from "../../types/index.js";
+import { config } from "../../config/config.js";
+import { store } from "../../lib/store/store.js";
+import type { SupportCategory } from "../../types/types.js";
 import { V2, CHANNEL, ROLE, supportChannelName, ticketControls } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
 import { log } from "../../lib/logger.js";

@@ -14,8 +14,8 @@ import {
   type TextChannel,
   type Guild,
 } from "discord.js";
-import { store, newId } from "../../lib/store/index.js";
-import { files } from "../../lib/files/index.js";
+import { store, newId } from "../../lib/store/store.js";
+import { files } from "../../lib/files/files.js";
 import { onButton, onSelect, onModal, cid } from "../../lib/interactions.js";
 import { container, text, separator, V2FLAG } from "../../lib/ui.js";
 import { CHANNEL, ROLE, V2, supportChannelName, ticketControls } from "../tickets/core.js";
@@ -24,7 +24,7 @@ import { memberHasAnyRole } from "../tickets/handlers.js";
 import { deliverOrder, resolveDownload, latestApproved } from "./delivery.js";
 import { logOrder } from "./panel.js";
 import { log } from "../../lib/logger.js";
-import type { SubmissionKind } from "../../types/index.js";
+import type { SubmissionKind } from "../../types/types.js";
 
 /** Post a submission to the quality-control channel with approve/reject buttons. */
 async function postToQc(guild: Guild, orderId: string, subId: string, designerId: string, kind: SubmissionKind, preview: string) {

@@ -1,4 +1,4 @@
-import type { OrderRecord } from "../../types/index.js";
+import type { OrderRecord } from "../../types/types.js";
 import { log } from "../logger.js";
 import {
   type Store,

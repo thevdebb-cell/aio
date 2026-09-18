@@ -8,10 +8,10 @@ import {
 import type { PrefixCommand } from "../../lib/framework.js";
 import { out } from "../../lib/msg.js";
 import { container, text, V2FLAG } from "../../lib/ui.js";
-import { store } from "../../lib/store/index.js";
-import { config, serviceByKey } from "../../config/index.js";
+import { store } from "../../lib/store/store.js";
+import { config, serviceByKey } from "../../config/config.js";
 import type { GuildSettings } from "../../lib/store/types.js";
-import type { ServiceStatus } from "../../types/index.js";
+import type { ServiceStatus } from "../../types/types.js";
 import { ROLE, CHANNEL } from "../../modules/tickets/core.js";
 import { buildSupportPanel } from "../../modules/support/panel.js";
 import { buildOrderPanel } from "../../modules/orders/panel.js";
