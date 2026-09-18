@@ -35,6 +35,8 @@ export interface Config {
     star: string;
     notification: string;
     memberCount: string;
+    /** optional bullet/emoji shown before each support category line */
+    supportBullet?: string;
   };
   banners: {
     assistanceTop: string;

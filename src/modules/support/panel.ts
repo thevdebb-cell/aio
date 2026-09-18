@@ -45,36 +45,26 @@ export function buildSupportPanel(): { components: [ReturnType<typeof container>
   const c = container();
   if (bannerExists(config.banners.assistanceTop)) c.addMediaGalleryComponents(banner(config.banners.assistanceTop));
 
+  const dot = e(config.emojis.supportBullet) || "•";
   c.addTextDisplayComponents(
-    text("# Star Customs — Assistance"),
-    text(
-      "Welcome to the **Star Customs** support desk. Whatever you need — a question, " +
-        "help with an order, reaching management, or reporting an issue — open a ticket " +
-        "below and a member of the team will take care of you as soon as possible.",
-    ),
-  );
-  c.addSeparatorComponents(separator(true));
-
-  c.addTextDisplayComponents(
-    text("## Support Categories"),
+    text("## Star Customs Assistance"),
     text(
       [
-        "**General Support** — questions, information, and anything that doesn't fit elsewhere.",
-        "**Order Support** — help with an existing order (give your Order ID if you have one).",
-        "**High Rank Support** — reach the management team directly for sensitive matters.",
-        "**Report** — report a user, a staff member, or a problem on the server.",
-        "**Bug Report** — tell us about a bug so we can fix it.",
-      ].join("\n\n"),
-    ),
-  );
-  c.addSeparatorComponents(separator(true));
-
-  c.addTextDisplayComponents(
-    text("## How It Works"),
-    text(
-      "Pick a category in the menu below and fill in the short form. A private channel is " +
-        "created just for you and the team. Please stay patient and avoid pinging staff — " +
-        "you'll be notified the moment your ticket is claimed.",
+        "**General Support**",
+        `${dot} Open this ticket for general questions, player assistance, or help with server-related issues.`,
+        "",
+        "**Order Support**",
+        `${dot} Open this ticket for help with an existing order — include your Order ID if you have one.`,
+        "",
+        "**High Rank Support**",
+        `${dot} Use this category for high-priority matters, appeals, or situations that require direct management review.`,
+        "",
+        "**Report**",
+        `${dot} Use this category to report a user, a staff member, or a problem on the server.`,
+        "",
+        "**Bug Report**",
+        `${dot} Open this ticket to tell us about a bug so the team can fix it.`,
+      ].join("\n"),
     ),
   );
   c.addSeparatorComponents(separator());
@@ -83,7 +73,7 @@ export function buildSupportPanel(): { components: [ReturnType<typeof container>
     new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId(cid("support", "open"))
-        .setPlaceholder("Select a support category to open a ticket")
+        .setPlaceholder("Select a ticket option")
         .addOptions(
           CATEGORIES.map((cat) =>
             new StringSelectMenuOptionBuilder().setLabel(cat.label).setDescription(cat.description).setValue(cat.value),
