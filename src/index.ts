@@ -4,6 +4,7 @@ import { initStore } from "./lib/store/index.js";
 import { initFileStore } from "./lib/files/index.js";
 import { slashCommands } from "./commands/slash/index.js";
 import { events } from "./events/index.js";
+import { deployCommands } from "./lib/deploy.js";
 import { log } from "./lib/logger.js";
 // Side-effect import: registers all button/select/modal handlers.
 import "./modules/index.js";
@@ -17,6 +18,15 @@ async function main() {
 
   await initStore();
   await initFileStore();
+
+  // Auto-register slash commands on startup (disable with DEPLOY_ON_START=false).
+  if (process.env.DEPLOY_ON_START !== "false") {
+    try {
+      await deployCommands();
+    } catch (err) {
+      log.error("[startup] command deploy failed (continuing anyway)", err);
+    }
+  }
 
   const client = createClient();
   for (const cmd of slashCommands) client.slash.set(cmd.data.name, cmd);
