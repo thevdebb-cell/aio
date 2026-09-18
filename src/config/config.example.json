@@ -1,0 +1,45 @@
+{
+  "owners": ["PUT_OWNER_DISCORD_ID_HERE"],
+  "whitelist": ["PUT_WHITELIST_DISCORD_ID_HERE"],
+
+  "links": {
+    "dashboard": "https://discord.com/channels/1548048791721082991/1548055857818902598",
+    "assistance": "https://discord.com/channels/1548048791721082991/1548055966770139176",
+    "order": "https://discord.com/channels/1548048791721082991/1548056393011953835"
+  },
+
+  "welcome": {
+    "channelId": "PUT_WELCOME_CHANNEL_ID_HERE"
+  },
+
+  "emojis": {
+    "orderUnclaimed": "",
+    "orderClaimed": "",
+    "wifiOnline": "",
+    "wifiDelayed": "",
+    "wifiOffline": "",
+    "wifiDev": "",
+    "star": "",
+    "notification": "",
+    "memberCount": ""
+  },
+
+  "banners": {
+    "assistanceTop": "assistance_top.png",
+    "assistanceBottom": "assistance_bottom.png",
+    "orderTop": "order_top.png",
+    "orderBottom": "order_bottom.png",
+    "welcomeDm": "welcome_dm.png",
+    "ticketClaimedDm": "ticket_claimed_dm.png",
+    "orderCreatedDm": "order_created_dm.png",
+    "orderReadyDm": "order_ready_dm.png",
+    "ratingDm": "rating_dm.png"
+  },
+
+  "services": [
+    { "key": "discord", "name": "Discord Development", "status": "on" },
+    { "key": "clothing", "name": "Clothing Development", "status": "on" },
+    { "key": "graphic", "name": "Graphic Development", "status": "on" },
+    { "key": "els", "name": "ELS Development", "status": "closed" }
+  ]
+}

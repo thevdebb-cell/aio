@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.env
+.env.local
+
+# Local runtime config (contains real Discord IDs / tokens)
+src/config/config.json
+config.json
+
+# Local data fallback (SQLite / JSON store when Supabase is not used)
+data/
+*.sqlite
+*.sqlite-journal
