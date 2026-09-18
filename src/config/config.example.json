@@ -12,6 +12,9 @@
     "channelId": "PUT_WELCOME_CHANNEL_ID_HERE"
   },
 
+  "autoRoles": [],
+  "verifiedRoleId": "",
+
   "emojis": {
     "orderUnclaimed": "",
     "orderClaimed": "",

@@ -6,6 +6,8 @@ import {
   type TicketRecord,
   type RatingRecord,
   type PrefixLogRecord,
+  type ModRecord,
+  type ModRecordType,
   defaultGuildSettings,
 } from "./types.js";
 
@@ -97,5 +99,15 @@ export class SupabaseStore implements Store {
   async listPrefixLogs(guildId: string, limit: number): Promise<PrefixLogRecord[]> {
     const { data } = await this.db.from("prefix_logs").select("data").order("id", { ascending: false }).limit(limit);
     return ((data ?? []) as { data: PrefixLogRecord }[]).map((r) => r.data).filter((l) => l.guildId === guildId);
+  }
+
+  async addModRecord(r: ModRecord): Promise<void> {
+    await this.db.from("mod_records").insert({ id: r.id, data: r });
+  }
+  async listModRecords(guildId: string, filter?: { targetId?: string; type?: ModRecordType }): Promise<ModRecord[]> {
+    const { data } = await this.db.from("mod_records").select("data");
+    return ((data ?? []) as { data: ModRecord }[])
+      .map((r) => r.data)
+      .filter((m) => m.guildId === guildId && (!filter?.targetId || m.targetId === filter.targetId) && (!filter?.type || m.type === filter.type));
   }
 }

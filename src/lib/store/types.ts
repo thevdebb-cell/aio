@@ -44,6 +44,22 @@ export interface PrefixLogRecord {
   createdAt: number;
 }
 
+export type ModRecordType = "warn" | "ban" | "kick" | "timeout" | "untimeout" | "infraction" | "promotion";
+
+export interface ModRecord {
+  id: string;
+  guildId: string;
+  type: ModRecordType;
+  /** for infractions/promotions: who it targets ("staff" | "designer") */
+  category: "staff" | "designer" | null;
+  targetId: string;
+  moderatorId: string;
+  reason: string;
+  /** free-form extra (e.g. new rank for a promotion, duration for a timeout) */
+  extra: string | null;
+  createdAt: number;
+}
+
 export interface Store {
   init(): Promise<void>;
 
@@ -70,6 +86,10 @@ export interface Store {
   // prefix command logs
   addPrefixLog(l: PrefixLogRecord): Promise<void>;
   listPrefixLogs(guildId: string, limit: number): Promise<PrefixLogRecord[]>;
+
+  // moderation / infractions / promotions
+  addModRecord(r: ModRecord): Promise<void>;
+  listModRecords(guildId: string, filter?: { targetId?: string; type?: ModRecordType }): Promise<ModRecord[]>;
 }
 
 export function defaultGuildSettings(guildId: string): GuildSettings {

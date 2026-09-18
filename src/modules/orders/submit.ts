@@ -150,7 +150,7 @@ onButton("orderdl", async (i: ButtonInteraction, parts) => {
   }
   const sub = latestApproved(order);
   if (!sub) return void i.reply({ content: "Nothing has been delivered yet.", ephemeral: true });
-  const dl = await resolveDownload(sub);
+  const dl = await resolveDownload(sub, order.id);
 
   if (action === "resend") {
     const buyer = await i.guild.members.fetch(order.buyerId).catch(() => null);

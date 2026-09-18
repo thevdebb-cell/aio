@@ -123,6 +123,18 @@ Prefix: `!` — slash: `/`
 | `/order <id>` | High Rank | (Re)deliver an order to its buyer |
 | `/dispute verdict <id> <winner>` | High Rank | Rule on a dispute |
 
+### Moderation & staff (slash)
+| Command | Access | Description |
+| --- | --- | --- |
+| `/ban`, `/kick` | High Rank | Ban / kick a user |
+| `/timeout <user> <duration>`, `/untimeout` | Support+ | Mute / unmute (e.g. `10m`, `2h`, `1d`) |
+| `/warn <user> <reason>`, `/warnings <user>` | Support+ | Warn / list warnings |
+| `/purge <amount>` | Support+ | Bulk-delete messages |
+| `/infraction issue` | High Rank | Issue a staff/designer infraction |
+| `/promotion issue` | High Rank | Issue a staff/designer promotion |
+| `/afk [reason]` | everyone | Set yourself AFK |
+| `/verify` | everyone | Link your Roblox account via Bloxlink |
+
 ---
 
 ## ▶ What I need from you (upload these)
@@ -192,6 +204,7 @@ create table tickets      (channel_id text primary key, data jsonb not null);
 create table orders       (id text primary key, data jsonb not null);
 create table ratings      (id text primary key, data jsonb not null);
 create table prefix_logs  (id bigint generated always as identity primary key, data jsonb not null);
+create table mod_records  (id text primary key, data jsonb not null);
 -- storage bucket "orders" (private) for submitted files; use createSignedUrl(path, 600) for downloads.
 ```
 
@@ -203,13 +216,19 @@ create table prefix_logs  (id bigint generated always as identity primary key, d
 - [x] `/submit` (file/zip/link/id), quality-control approval, "order ready" DM.
 - [x] Expiring download links (local server or Supabase signed URLs) + regen.
 - [x] Reviews (public/anonymous) + `!rateslogs`, confirmation flow, disputes.
-- [ ] `/promotion issue`, `/infraction issue` (staff + designer).
-- [ ] Moderation suite + AFK.
-- [ ] Bloxlink verification + auto-role.
+- [x] `/infraction issue`, `/promotion issue` (staff + designer).
+- [x] Moderation suite (ban/kick/timeout/warn/purge) + AFK.
+- [x] Bloxlink verification (`/verify`) + auto-role on join.
+- [x] Netlify download site (see `site/`).
 
 Optional assets: `assets/art_bg.png` (background used behind transparent
 delivery previews) and `assets/watermark.png` (unused — the watermark is
 generated from text; add only if you want a custom logo overlay later).
+
+## Deploying
+
+See **[DEPLOY.md](DEPLOY.md)** for the full guide: bot on bot-hosting.net,
+Supabase (database + file storage), and the Netlify download site in `site/`.
 
 ---
 

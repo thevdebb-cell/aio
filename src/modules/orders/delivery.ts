@@ -14,6 +14,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { store } from "../../lib/store/index.js";
 import { files, linkTtlSeconds } from "../../lib/files/index.js";
+import { siteEnabled, buildSiteLink } from "../../lib/files/site-link.js";
 import { config } from "../../config/index.js";
 import { container, text, ASSETS_DIR } from "../../lib/ui.js";
 import { cid } from "../../lib/interactions.js";
@@ -27,9 +28,10 @@ export function latestApproved(order: OrderRecord): Submission | null {
 }
 
 /** Resolve the download target for a submission (signed URL for files, raw for link/id). */
-export async function resolveDownload(sub: Submission): Promise<{ label: string; url: string | null; text: string | null }> {
+export async function resolveDownload(sub: Submission, orderId: string): Promise<{ label: string; url: string | null; text: string | null }> {
   if ((sub.kind === "file" || sub.kind === "zip") && sub.fileKey) {
-    const url = await files().signedUrl(sub.fileKey, linkTtlSeconds());
+    // Prefer the branded Netlify site link when configured; else a direct signed URL.
+    const url = siteEnabled() ? buildSiteLink(orderId) : await files().signedUrl(sub.fileKey, linkTtlSeconds());
     return { label: sub.filename ?? "Download", url, text: null };
   }
   if (sub.kind === "link") return { label: "Open link", url: sub.value, text: null };
@@ -67,7 +69,7 @@ function readyDmComponents(order: OrderRecord, dl: { label: string; url: string 
 export async function deliverOrder(guild: Guild, order: OrderRecord): Promise<{ dmOk: boolean }> {
   const sub = latestApproved(order);
   if (!sub) throw new Error("No approved submission to deliver.");
-  const dl = await resolveDownload(sub);
+  const dl = await resolveDownload(sub, order.id);
 
   // DM the buyer.
   let dmOk = false;

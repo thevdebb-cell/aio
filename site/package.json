@@ -1,0 +1,10 @@
+{
+  "name": "star-customs-download-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Netlify download portal for Star Customs orders",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

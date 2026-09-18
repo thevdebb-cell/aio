@@ -21,6 +21,10 @@ export interface Config {
   welcome: {
     channelId: string;
   };
+  /** roles auto-assigned to humans on join */
+  autoRoles: string[];
+  /** role granted by /verify (Bloxlink) — optional */
+  verifiedRoleId: string;
   emojis: {
     orderUnclaimed: string;
     orderClaimed: string;

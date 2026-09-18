@@ -4,12 +4,16 @@ import { prefixLookup } from "../commands/prefix/index.js";
 import { isOwner, isWhitelisted } from "../config/index.js";
 import { store } from "../lib/store/index.js";
 import { enforceOrderMedia } from "../modules/orders/media-guard.js";
+import { handleAfkMessage } from "../modules/afk/index.js";
 import { log } from "../lib/logger.js";
 
 export default defineEvent({
   name: Events.MessageCreate,
   execute: async (message: Message) => {
     if (message.author.bot || !message.guild) return;
+
+    // AFK: clear the author's AFK / notify on mentions.
+    await handleAfkMessage(message);
 
     // Block raw image/file posts inside order tickets.
     if (await enforceOrderMedia(message)) return;

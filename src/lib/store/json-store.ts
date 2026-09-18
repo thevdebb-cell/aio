@@ -8,6 +8,8 @@ import {
   type TicketRecord,
   type RatingRecord,
   type PrefixLogRecord,
+  type ModRecord,
+  type ModRecordType,
   defaultGuildSettings,
 } from "./types.js";
 
@@ -23,6 +25,7 @@ export class JsonStore implements Store {
   private orders = new Map<string, OrderRecord>();
   private ratings: RatingRecord[] = [];
   private prefixLogs: PrefixLogRecord[] = [];
+  private modRecords: ModRecord[] = [];
 
   constructor(dir = join(process.cwd(), "data")) {
     this.dir = dir;
@@ -35,6 +38,7 @@ export class JsonStore implements Store {
     this.orders = new Map(Object.entries(this.read<Record<string, OrderRecord>>("orders", {})));
     this.ratings = this.read<RatingRecord[]>("ratings", []);
     this.prefixLogs = this.read<PrefixLogRecord[]>("prefixlogs", []);
+    this.modRecords = this.read<ModRecord[]>("modrecords", []);
     log.info(`[store] json store ready (${this.dir})`);
   }
 
@@ -146,5 +150,20 @@ export class JsonStore implements Store {
       .filter((l) => l.guildId === guildId)
       .slice(-limit)
       .reverse();
+  }
+
+  // ── mod records ──
+  async addModRecord(r: ModRecord): Promise<void> {
+    this.modRecords.push(r);
+    this.write("modrecords", this.modRecords);
+  }
+
+  async listModRecords(guildId: string, filter?: { targetId?: string; type?: ModRecordType }): Promise<ModRecord[]> {
+    return this.modRecords.filter(
+      (r) =>
+        r.guildId === guildId &&
+        (!filter?.targetId || r.targetId === filter.targetId) &&
+        (!filter?.type || r.type === filter.type),
+    );
   }
 }

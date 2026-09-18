@@ -1,0 +1,12 @@
+# Netlify configuration for the Star Customs download site.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Pretty download URL: /dl?id=...&t=...  ->  the download function
+[[redirects]]
+  from = "/dl"
+  to = "/.netlify/functions/download"
+  status = 200
+  force = true
