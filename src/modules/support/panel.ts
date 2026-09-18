@@ -12,7 +12,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { onSelect, onModal, cid } from "../../lib/interactions.js";
-import { container, text, separator, banner, bannerFiles, e } from "../../lib/ui.js";
+import { container, text, separator, banner, bannerFiles, bannerExists, e } from "../../lib/ui.js";
 import { config } from "../../config/config.js";
 import { store } from "../../lib/store/store.js";
 import type { SupportCategory } from "../../types/types.js";
@@ -43,7 +43,7 @@ function metaFor(value: string): CatMeta | undefined {
 /** Build the assistance/support panel (Components V2, black, two banners). */
 export function buildSupportPanel(): { components: [ReturnType<typeof container>]; files: AttachmentBuilder[] } {
   const c = container();
-  if (config.banners.assistanceTop) c.addMediaGalleryComponents(banner(config.banners.assistanceTop));
+  if (bannerExists(config.banners.assistanceTop)) c.addMediaGalleryComponents(banner(config.banners.assistanceTop));
   c.addTextDisplayComponents(
     text("## Assistance"),
     text("Need a hand? Open a ticket below and the team will get back to you."),
@@ -61,7 +61,7 @@ export function buildSupportPanel(): { components: [ReturnType<typeof container>
         ),
     ),
   );
-  if (config.banners.assistanceBottom) c.addMediaGalleryComponents(banner(config.banners.assistanceBottom));
+  if (bannerExists(config.banners.assistanceBottom)) c.addMediaGalleryComponents(banner(config.banners.assistanceBottom));
 
   return { components: [c], files: bannerFiles(config.banners.assistanceTop, config.banners.assistanceBottom) };
 }

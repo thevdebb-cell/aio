@@ -54,6 +54,12 @@ export function banner(filename: string): MediaGalleryBuilder {
   );
 }
 
+/** True only if the banner image actually exists in assets/ (so we never
+ * reference a missing attachment, which Discord rejects). */
+export function bannerExists(filename: string): boolean {
+  return Boolean(filename) && existsSync(join(ASSETS_DIR, filename));
+}
+
 /** A fresh black container. */
 export function container(): ContainerBuilder {
   return new ContainerBuilder().setAccentColor(BLACK);

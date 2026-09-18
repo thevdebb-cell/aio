@@ -18,7 +18,7 @@ import {
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { onSelect, onModal, cid } from "../../lib/interactions.js";
-import { container, text, separator, banner, bannerFiles, ASSETS_DIR } from "../../lib/ui.js";
+import { container, text, separator, banner, bannerFiles, bannerExists, ASSETS_DIR } from "../../lib/ui.js";
 import { config } from "../../config/config.js";
 import { store, newOrderId } from "../../lib/store/store.js";
 import type { OrderTicketType } from "../../types/types.js";
@@ -34,7 +34,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
   const services = resolvedServices(settings);
 
   const c = container();
-  if (config.banners.orderTop) c.addMediaGalleryComponents(banner(config.banners.orderTop));
+  if (bannerExists(config.banners.orderTop)) c.addMediaGalleryComponents(banner(config.banners.orderTop));
   c.addTextDisplayComponents(text("## Services Panel"));
   c.addSeparatorComponents(separator());
   c.addTextDisplayComponents(text("## Order Status"), text(services.map(statusLine).join("\n")));
@@ -55,7 +55,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
         .addOptions(options.length ? options : [new StringSelectMenuOptionBuilder().setLabel("No services available").setValue("none")]),
     ),
   );
-  if (config.banners.orderBottom) c.addMediaGalleryComponents(banner(config.banners.orderBottom));
+  if (bannerExists(config.banners.orderBottom)) c.addMediaGalleryComponents(banner(config.banners.orderBottom));
 
   return { components: [c], files: bannerFiles(config.banners.orderTop, config.banners.orderBottom) };
 }
