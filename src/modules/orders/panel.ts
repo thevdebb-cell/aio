@@ -141,6 +141,7 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
     claimedAt: null,
     deliveredAt: null,
     confirmedAt: null,
+    submissions: [],
   });
 
   await store().createTicket({

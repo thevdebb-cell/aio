@@ -83,6 +83,11 @@ async function handleClaim(i: ButtonInteraction) {
 
   await store().updateTicket(channel.id, { claimedBy: member.id });
 
+  // Reflect the claim on the linked order record.
+  if (ticket.kind === "order" && ticket.orderId) {
+    await store().updateOrder(ticket.orderId, { designerId: member.id, status: "claimed", claimedAt: Date.now() });
+  }
+
   // Re-lock permissions to the claimer and rename order channels.
   await channel.permissionOverwrites.set(
     ticketOverwrites({

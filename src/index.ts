@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "./lib/client.js";
 import { initStore } from "./lib/store/index.js";
+import { initFileStore } from "./lib/files/index.js";
 import { slashCommands } from "./commands/slash/index.js";
 import { events } from "./events/index.js";
 import { log } from "./lib/logger.js";
@@ -15,6 +16,7 @@ async function main() {
   }
 
   await initStore();
+  await initFileStore();
 
   const client = createClient();
   for (const cmd of slashCommands) client.slash.set(cmd.data.name, cmd);

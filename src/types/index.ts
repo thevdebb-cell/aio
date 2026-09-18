@@ -73,6 +73,22 @@ export type OrderStatus =
   | "dispute"
   | "cancelled";
 
+export type SubmissionKind = "file" | "zip" | "link" | "id";
+
+export interface Submission {
+  id: string;
+  kind: SubmissionKind;
+  /** URL (link), raw id text, or the source discord attachment URL for file/zip */
+  value: string;
+  /** storage key once uploaded to the file store (file/zip only) */
+  fileKey: string | null;
+  filename: string | null;
+  submittedBy: string;
+  at: number;
+  approved: boolean;
+  approvedBy: string | null;
+}
+
 export interface OrderRecord {
   id: string;
   guildId: string;
@@ -86,4 +102,7 @@ export interface OrderRecord {
   claimedAt: number | null;
   deliveredAt: number | null;
   confirmedAt: number | null;
+  submissions: Submission[];
+  /** set true once the buyer confirms; after this the team can't change the order */
+  buyerConfirmed?: boolean;
 }
