@@ -10,6 +10,7 @@
     "start:prod": "tsx src/index.ts",
     "host": "npm run deploy && npm run start:prod",
     "dev": "tsx watch src/index.ts",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --outfile=bot.js --banner:js=\"import{createRequire as _cr}from'module';const require=_cr(import.meta.url);\"",
     "deploy": "tsx src/deploy-commands.ts",
     "lint": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit"

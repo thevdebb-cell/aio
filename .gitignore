@@ -12,3 +12,4 @@ config.json
 data/
 *.sqlite
 *.sqlite-journal
+bot.js

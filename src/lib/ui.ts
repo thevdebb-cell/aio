@@ -26,7 +26,11 @@ import { dirname, join } from "node:path";
 import { log } from "./logger.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-export const ASSETS_DIR = join(__dirname, "..", "..", "assets");
+// Prefer an explicit ASSETS_DIR, else <cwd>/assets (works when bundled to a
+// single file), else the path relative to this module (source/dist layouts).
+export const ASSETS_DIR =
+  process.env.ASSETS_DIR ??
+  (existsSync(join(process.cwd(), "assets")) ? join(process.cwd(), "assets") : join(__dirname, "..", "..", "assets"));
 
 /** Embed/accent colour used everywhere: black. */
 export const BLACK = 0x000000;
