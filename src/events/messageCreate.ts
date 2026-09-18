@@ -3,12 +3,17 @@ import { defineEvent, PREFIX } from "../lib/framework.js";
 import { prefixLookup } from "../commands/prefix/index.js";
 import { isOwner, isWhitelisted } from "../config/index.js";
 import { store } from "../lib/store/index.js";
+import { enforceOrderMedia } from "../modules/orders/media-guard.js";
 import { log } from "../lib/logger.js";
 
 export default defineEvent({
   name: Events.MessageCreate,
   execute: async (message: Message) => {
     if (message.author.bot || !message.guild) return;
+
+    // Block raw image/file posts inside order tickets.
+    if (await enforceOrderMedia(message)) return;
+
     if (!message.content.startsWith(PREFIX)) return;
 
     const [name, ...args] = message.content.slice(PREFIX.length).trim().split(/\s+/);
