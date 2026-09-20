@@ -24,7 +24,7 @@ import { store, newOrderId } from "../../lib/store/store.js";
 import type { OrderTicketType } from "../../types/types.js";
 import { V2, CHANNEL, ROLE, orderChannelName, ticketControls } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
-import { resolvedServices, statusLine, statusOf, STATUS } from "./status.js";
+import { resolvedServices, statusLine, statusOf, STATUS, DEFAULT_STARPLUS_ROLE_ID } from "./status.js";
 import { log } from "../../lib/logger.js";
 import type { GuildSettings } from "../../lib/store/types.js";
 
@@ -52,7 +52,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
   // Status legend (uses your wifi emojis when set)
   const legend = [
     `${e(config.emojis.wifiOnline)} **Online** — available to order now`,
-    `${e(config.emojis.wifiDelayed)} **Delayed** — orderable, but may take a little longer`,
+    `${e(config.emojis.wifiDelayed)} **Star Plus** — reserved for Star Plus members`,
     `${e(config.emojis.wifiOffline)} **Offline** — temporarily closed, try again later`,
     `${e(config.emojis.wifiDev)} **Unavailable** — not offered right now`,
   ].map((l) => l.trimStart());
@@ -106,6 +106,14 @@ onSelect("order", async (i: StringSelectMenuInteraction) => {
   if (status === "closed") {
     await i.reply({ content: "This service is currently **offline**. Please try again later.", ephemeral: true });
     return;
+  }
+  if (status === "starplus") {
+    const roleId = config.starPlusRoleId || DEFAULT_STARPLUS_ROLE_ID;
+    const member = await i.guild.members.fetch(i.user.id).catch(() => null);
+    if (!member || !member.roles.cache.has(roleId)) {
+      await i.reply({ content: "This service is **Star Plus** only — you need the Star Plus role to open it.", ephemeral: true });
+      return;
+    }
   }
 
   const service = resolvedServices(settings).find((s) => s.key === key)!;
@@ -191,7 +199,7 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
   c.addSeparatorComponents(separator());
   const lines = [`**Details:**\n${details}`];
   if (references) lines.push(`**References:**\n${references}`);
-  if (status === "delay") lines.push(`This service is **delayed** — your order may take a little longer than usual.`);
+  if (status === "starplus") lines.push(`This is a **Star Plus** order.`);
   c.addTextDisplayComponents(text(lines.join("\n")));
 
   await channel.send({ flags: V2, components: [c] });

@@ -11,10 +11,13 @@ export interface StatusMeta {
 
 export const STATUS: Record<ServiceStatus, StatusMeta> = {
   on: { label: "Online", emojiKey: "wifiOnline", selectable: true },
-  delay: { label: "Delayed", emojiKey: "wifiDelayed", selectable: true },
+  starplus: { label: "Star Plus", emojiKey: "wifiDelayed", selectable: true }, // orange — only the Star Plus role may open
   closed: { label: "Offline", emojiKey: "wifiOffline", selectable: true }, // selectable, but shows a "closed" notice
   unavail: { label: "Unavailable", emojiKey: "wifiDev", selectable: false },
 };
+
+/** Hardcoded default Star Plus role (overridable via config.starPlusRoleId). */
+export const DEFAULT_STARPLUS_ROLE_ID = "1548058652462678181";
 
 /** Merge config defaults with live per-guild overrides set by !service. */
 export function resolvedServices(settings: GuildSettings): ServiceDef[] {

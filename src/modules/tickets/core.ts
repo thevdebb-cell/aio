@@ -75,7 +75,7 @@ export function orderChannelName(opts: {
   queue?: number;
 }): string {
   const emoji = opts.claimed ? e(config.emojis.orderClaimed) : e(config.emojis.orderUnclaimed);
-  const lead = emoji ? `${emoji} • ` : "";
+  const lead = emoji ? `${emoji}ㆍ` : "";
   if (opts.claimed) {
     const tail = opts.queue !== undefined ? `-${opts.queue}` : "";
     return `${lead}${opts.type}-${sanitize(opts.designer ?? "designer")}${tail}`.slice(0, 90);
@@ -127,12 +127,12 @@ export function ticketControls(claimed: boolean): ActionRowBuilder<ButtonBuilder
   const row = new ActionRowBuilder<ButtonBuilder>();
   if (!claimed) {
     row.addComponents(
-      new ButtonBuilder().setCustomId(cid("ticket", "claim")).setLabel("Claim").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId(cid("ticket", "claim")).setLabel("Claim").setStyle(ButtonStyle.Secondary),
     );
   } else {
     row.addComponents(
       new ButtonBuilder().setCustomId(cid("ticket", "unclaim")).setLabel("Unclaim").setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder().setCustomId(cid("ticket", "close")).setLabel("Close").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId(cid("ticket", "close")).setLabel("Close").setStyle(ButtonStyle.Secondary),
     );
   }
   row.addComponents(

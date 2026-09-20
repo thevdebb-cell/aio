@@ -75,9 +75,9 @@ const setup: PrefixCommand = {
     await store().saveGuild(settings);
 
     const c = container().addTextDisplayComponents(
-      text("## Setup complete"),
-      text(created.length ? created.map((x) => `• ${x}`).join("\n") : "Everything was already in place."),
-      text("Now run `!sendsupportpanel` and `!sendorderpanel` in the channels where you want the panels."),
+      text("## Setup Complete"),
+      text("All roles and channels are ready"),
+      text("Run !sendsupportpanel and !sendorderpanel in the channels you want"),
     );
     await out(message).send({ flags: V2FLAG, components: [c] });
     log.info(`[setup] done for ${guild.name} (${created.length} created)`);
@@ -103,7 +103,10 @@ const sendOrderPanel: PrefixCommand = {
   execute: async (message) => {
     if (!message.guild) return;
     const { components, files } = await buildOrderPanel(message.guild.id);
-    await out(message).send({ flags: V2FLAG, components, files });
+    const sent = await out(message).send({ flags: V2FLAG, components, files });
+    const s = await store().getGuild(message.guild.id);
+    s.orderPanel = { channelId: sent.channelId, messageId: sent.id };
+    await store().saveGuild(s);
     await message.delete().catch(() => {});
   },
 };
@@ -157,8 +160,9 @@ const prefixLogs: PrefixCommand = {
 const STATUS_ALIASES: Record<string, ServiceStatus> = {
   on: "on",
   online: "on",
-  delay: "delay",
-  delayed: "delay",
+  starplus: "starplus",
+  "star+": "starplus",
+  star: "starplus",
   closed: "closed",
   offline: "closed",
   unavail: "unavail",
@@ -167,7 +171,7 @@ const STATUS_ALIASES: Record<string, ServiceStatus> = {
 
 const service: PrefixCommand = {
   name: "service",
-  description: "Set a service status: !service <service> <on|delay|closed|unavail>",
+  description: "Set a service status: !service <service> <on|starplus|closed|unavail>",
   whitelistOnly: true,
   execute: async (message, args) => {
     if (!message.guild) return;
@@ -178,15 +182,35 @@ const service: PrefixCommand = {
     if (!def || !status) {
       const services = config.services.map((s) => s.key).join(", ");
       await out(message).send({
-        content: `Usage: \`!service <service> <on|delay|closed|unavail>\`\nServices: ${services}`,
+        content: `Usage: \`!service <service> <on|starplus|closed|unavail>\`\nServices: ${services}`,
       });
       return;
     }
     const s = await store().getGuild(message.guild.id);
     s.serviceStatus[key] = status;
     await store().saveGuild(s);
+
+    // Edit the posted order panel in place — never resend.
+    let edited = false;
+    if (s.orderPanel && message.guild) {
+      try {
+        const ch = await message.guild.channels.fetch(s.orderPanel.channelId).catch(() => null);
+        if (ch && ch.type === ChannelType.GuildText) {
+          const msg = await (ch as TextChannel).messages.fetch(s.orderPanel.messageId).catch(() => null);
+          if (msg) {
+            const { components, files } = await buildOrderPanel(message.guild.id);
+            await msg.edit({ flags: V2FLAG, components, files });
+            edited = true;
+          }
+        }
+      } catch {
+        /* ignore, fall back to notice */
+      }
+    }
     await out(message).send({
-      content: `**${def.name}** is now **${STATUS[status].label}**. Re-run \`!sendorderpanel\` to refresh a posted panel.`,
+      content: edited
+        ? `**${def.name}** is now **${STATUS[status].label}** — panel updated.`
+        : `**${def.name}** is now **${STATUS[status].label}**. Send the panel with \`!sendorderpanel\` so it can auto-update next time.`,
     });
   },
 };

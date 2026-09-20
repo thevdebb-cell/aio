@@ -8,6 +8,8 @@ export interface GuildSettings {
   channels: Record<string, string>; // logical name -> channel id
   /** live service statuses override the config defaults once !service is used */
   serviceStatus: Record<string, ServiceStatus>;
+  /** posted order panel, so !service can edit it in place instead of resending */
+  orderPanel?: { channelId: string; messageId: string };
 }
 
 export interface TicketRecord {

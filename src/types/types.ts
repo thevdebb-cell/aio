@@ -1,6 +1,6 @@
 // ── Shared domain types ─────────────────────────────────
 
-export type ServiceStatus = "on" | "delay" | "closed" | "unavail";
+export type ServiceStatus = "on" | "starplus" | "closed" | "unavail";
 
 export interface ServiceDef {
   /** stable key used by !service and internally (e.g. "graphic") */
@@ -25,6 +25,8 @@ export interface Config {
   autoRoles: string[];
   /** role granted by /verify (Bloxlink) — optional */
   verifiedRoleId: string;
+  /** only this role may open an order when a service is in "Star Plus" status */
+  starPlusRoleId?: string;
   emojis: {
     orderUnclaimed: string;
     orderClaimed: string;
