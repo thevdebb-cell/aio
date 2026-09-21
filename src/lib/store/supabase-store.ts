@@ -1,4 +1,5 @@
 import type { OrderRecord } from "../../types/types.js";
+import { applyConfigDesignerRoles } from "../../config/config.js";
 import { log } from "../logger.js";
 import {
   type Store,
@@ -37,9 +38,14 @@ export class SupabaseStore implements Store {
 
   async getGuild(guildId: string): Promise<GuildSettings> {
     const { data } = await this.db.from("guilds").select("data").eq("guild_id", guildId).maybeSingle();
-    if (data?.data) return data.data as GuildSettings;
+    if (data?.data) {
+      const g = data.data as GuildSettings;
+      applyConfigDesignerRoles(g.roles);
+      return g;
+    }
     const fresh = defaultGuildSettings(guildId);
     await this.saveGuild(fresh);
+    applyConfigDesignerRoles(fresh.roles);
     return fresh;
   }
 

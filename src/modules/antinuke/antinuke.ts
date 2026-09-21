@@ -12,13 +12,14 @@ import {
 } from "discord.js";
 import { isWhitelisted, isOwner } from "../../config/config.js";
 import { store } from "../../lib/store/store.js";
-import { ROLE, CHANNEL } from "../tickets/core.js";
+import { CHANNEL } from "../tickets/core.js";
+import { container, text } from "../../lib/ui.js";
+import { MessageFlags } from "discord.js";
 import { log } from "../../lib/logger.js";
 
 const QUARANTINE_STRIKES = 3;
-const TIMEOUT_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-/** userId -> strike count within the guild. Resets on quarantine. */
+/** userId -> strike count within the guild. Resets when the threshold is hit. */
 const strikes = new Map<string, number>();
 
 function key(guildId: string, userId: string) {
@@ -67,35 +68,43 @@ async function strike(guild: Guild, userId: string, reason: string) {
 
   if (count >= QUARANTINE_STRIKES) {
     strikes.delete(k);
-    await quarantine(guild, userId, reason);
+    // Warn-only mode: the offending action is already reverted by the guard.
+    // No role strip, no timeout, no quarantine - just alert staff and the user.
+    await dm(
+      guild,
+      userId,
+      `Final warning in ${guild.name}: repeated unauthorized actions detected (${reason}). ` +
+        `Your actions are being reverted and logged for staff.`,
+    );
+    await logAntinuke(
+      guild,
+      `Anti-nuke: <@${userId}> reached ${QUARANTINE_STRIKES} strikes - ${reason}. Actions reverted, no quarantine applied.`,
+    );
   } else {
     await dm(
       guild,
       userId,
       `Warning (${count}/${QUARANTINE_STRIKES}): unauthorized action detected - ${reason}. ` +
-        `Continuing will get you quarantined and timed out.`,
+        `Your action was reverted - continuing will be reported to staff.`,
     );
   }
 }
 
-async function quarantine(guild: Guild, userId: string, reason: string) {
-  const member = await guild.members.fetch(userId).catch(() => null);
-  if (!member) return;
-
-  const settings = await store().getGuild(guild.id);
-  const quarantineRoleId = settings.roles[ROLE.quarantine];
-
-  await dm(guild, userId, `You have been quarantined in ${guild.name} for repeated unauthorized actions (${reason}).`);
-
-  // Strip roles, apply quarantine role, timeout.
+/** Post an anti-nuke notice to the staff logs channel (Components V2, black). */
+async function logAntinuke(guild: Guild, message: string) {
   try {
-    const removable = member.roles.cache.filter((r) => r.id !== guild.roles.everyone.id && r.editable);
-    await member.roles.remove(removable, `Anti-nuke quarantine: ${reason}`).catch(() => {});
-    if (quarantineRoleId) await member.roles.add(quarantineRoleId, "Anti-nuke quarantine").catch(() => {});
-    await member.timeout(TIMEOUT_MS, `Anti-nuke quarantine: ${reason}`).catch(() => {});
-    log.warn(`[antinuke] quarantined ${member.user.tag}`);
+    const settings = await store().getGuild(guild.id);
+    const chanId = settings.channels[CHANNEL.logs];
+    if (!chanId) return;
+    const chan = await guild.channels.fetch(chanId).catch(() => null);
+    if (chan && chan.type === ChannelType.GuildText) {
+      await chan.send({
+        flags: MessageFlags.IsComponentsV2,
+        components: [container().addTextDisplayComponents(text(message))],
+      });
+    }
   } catch (err) {
-    log.error("[antinuke] quarantine failed", err);
+    log.error("[antinuke] could not post log", err);
   }
 }
 

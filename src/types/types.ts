@@ -8,6 +8,8 @@ export interface ServiceDef {
   /** human label shown in the panel (e.g. "Graphic Development") */
   name: string;
   status: ServiceStatus;
+  /** existing Discord role id of the designer team for this service (optional) */
+  roleId?: string;
 }
 
 export interface Config {
@@ -65,11 +67,8 @@ export type SupportCategory =
 
 // ── Order tickets ───────────────────────────────────────
 
-export type OrderTicketType =
-  | "discord"
-  | "clothing"
-  | "graphic"
-  | "els";
+/** Service key of an order ticket. Services are config-driven, so this is any key. */
+export type OrderTicketType = string;
 
 export type OrderStatus =
   | "open"

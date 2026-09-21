@@ -41,9 +41,12 @@
   },
 
   "services": [
-    { "key": "discord", "name": "Discord Development", "status": "on" },
-    { "key": "clothing", "name": "Clothing Development", "status": "on" },
-    { "key": "graphic", "name": "Graphic Development", "status": "on" },
-    { "key": "els", "name": "ELS Development", "status": "closed" }
+    { "key": "liv", "name": "Livery Development", "status": "on", "roleId": "1548061412838998067" },
+    { "key": "els", "name": "ELS Development", "status": "on", "roleId": "1548061520254996620" },
+    { "key": "unf", "name": "Uniform Development", "status": "on", "roleId": "1548061648076410890" },
+    { "key": "graphic", "name": "Graphic Development", "status": "on", "roleId": "1548061705534447678" },
+    { "key": "server", "name": "Server Development", "status": "on", "roleId": "1548061761540849734" },
+    { "key": "bot", "name": "Bot Development", "status": "on", "roleId": "1548061805308543076" },
+    { "key": "template", "name": "Template Development", "status": "on", "roleId": "1548061875231522836" }
   ]
 }

@@ -60,3 +60,15 @@ export function isWhitelisted(userId: string): boolean {
 export function serviceByKey(key: string) {
   return config.services.find((s) => s.key.toLowerCase() === key.toLowerCase());
 }
+
+/**
+ * Overlay the designer role ids declared in config.services onto a guild's
+ * role map, under the `designer_<key>` logical key. This lets existing Discord
+ * roles be used for each service without !setup creating brand-new ones.
+ * Called on every getGuild so config stays the source of truth.
+ */
+export function applyConfigDesignerRoles(roles: Record<string, string>): void {
+  for (const s of config.services) {
+    if (s.roleId) roles[`designer_${s.key}`] = s.roleId;
+  }
+}

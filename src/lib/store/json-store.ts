@@ -1,6 +1,7 @@
 import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import type { OrderRecord } from "../../types/types.js";
+import { applyConfigDesignerRoles } from "../../config/config.js";
 import { log } from "../logger.js";
 import {
   type Store,
@@ -72,6 +73,7 @@ export class JsonStore implements Store {
       this.guilds.set(guildId, g);
       this.write("guilds", Object.fromEntries(this.guilds));
     }
+    applyConfigDesignerRoles(g.roles);
     return g;
   }
 
