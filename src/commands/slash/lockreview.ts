@@ -33,6 +33,6 @@ export const lockreview: SlashCommand = {
 
     // Non-embed notice.
     await channel.send({ content: "order is currently under review" }).catch(() => {});
-    await i.editReply({ content: "Ticket locked for review — only you can speak now." });
+    await i.editReply({ content: "Ticket locked for review - only you can speak now." });
   },
 };

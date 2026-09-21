@@ -16,7 +16,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { GuildSettings, TicketRecord } from "../../lib/store/types.js";
 import { cid } from "../../lib/interactions.js";
-import { container, text, e, ASSETS_DIR } from "../../lib/ui.js";
+import { container, text, separator, e, ASSETS_DIR } from "../../lib/ui.js";
 import { config } from "../../config/config.js";
 import { log } from "../../lib/logger.js";
 
@@ -139,6 +139,14 @@ export function ticketControls(claimed: boolean): ActionRowBuilder<ButtonBuilder
     new ButtonBuilder().setCustomId(cid("ticket", "cancel")).setLabel("Cancel").setStyle(ButtonStyle.Secondary),
   );
   return row;
+}
+
+/** A Components V2 box that holds the ticket buttons INSIDE it (grey). */
+export function controlsPanel(claimed: boolean) {
+  return container()
+    .addTextDisplayComponents(text("## Ticket Controls"))
+    .addSeparatorComponents(separator())
+    .addActionRowComponents(ticketControls(claimed));
 }
 
 function bannerFile(name: string): AttachmentBuilder[] {

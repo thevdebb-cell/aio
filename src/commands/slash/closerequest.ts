@@ -75,7 +75,7 @@ onButton("closereq", async (i: ButtonInteraction, parts) => {
       const tc = await i.guild.channels.fetch(tId).catch(() => null);
       if (tc && tc.type === ChannelType.GuildText) {
         const file = await buildTranscript(channel, ticketRec);
-        await (tc as TextChannel).send({ content: `Transcript — #${channel.name} (close request accepted)`, files: [file] });
+        await (tc as TextChannel).send({ content: `Transcript - #${channel.name} (close request accepted)`, files: [file] });
       }
     }
   } catch (err) {

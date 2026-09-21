@@ -32,6 +32,6 @@ export const delivered: SlashCommand = {
     }
     await i.deferReply({ ephemeral: true });
     await markDelivered(i.guild, channel, order, i.user.id);
-    await i.editReply({ content: "Marked as delivered — the buyer has been notified." });
+    await i.editReply({ content: "Marked as delivered - the buyer has been notified." });
   },
 };

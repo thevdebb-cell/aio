@@ -131,7 +131,7 @@ const warnings: SlashCommand = {
       : "No warnings.";
     await i.reply({
       flags: V2FLAG,
-      components: [container().addTextDisplayComponents(text(`## Warnings — ${user.tag}`), text(body))],
+      components: [container().addTextDisplayComponents(text(`## Warnings - ${user.tag}`), text(body))],
       ephemeral: true,
     });
   },

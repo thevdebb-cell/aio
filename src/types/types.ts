@@ -23,7 +23,7 @@ export interface Config {
   };
   /** roles auto-assigned to humans on join */
   autoRoles: string[];
-  /** role granted by /verify (Bloxlink) — optional */
+  /** role granted by /verify (Bloxlink) - optional */
   verifiedRoleId: string;
   /** only this role may open an order when a service is in "Star Plus" status */
   starPlusRoleId?: string;

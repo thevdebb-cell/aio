@@ -38,7 +38,7 @@ export const orderinfo: SlashCommand = {
           `**Status:** ${order.status}`,
           `**Service:** ${order.type}`,
           `**Buyer:** <@${order.buyerId}>`,
-          `**Designer:** ${order.designerId ? `<@${order.designerId}>` : "—"}`,
+          `**Designer:** ${order.designerId ? `<@${order.designerId}>` : "-"}`,
           `**Channel:** <#${order.channelId}>`,
           `**Created:** <t:${Math.floor(order.createdAt / 1000)}:f>`,
           order.claimedAt ? `**Claimed:** <t:${Math.floor(order.claimedAt / 1000)}:f>` : "",

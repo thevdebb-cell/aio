@@ -142,7 +142,7 @@ async function alertQualityControl(guild: Guild, order: OrderRecord, byId: strin
     if (qc && qc.type === ChannelType.GuildText) {
       const c = container().addTextDisplayComponents(
         text("## Quality Control Alert"),
-        text([`Order \`${order.id}\``, headline, `Buyer <@${order.buyerId}>`, `Designer ${order.designerId ? `<@${order.designerId}>` : "—"}`].join("\n")),
+        text([`Order \`${order.id}\``, headline, `Buyer <@${order.buyerId}>`, `Designer ${order.designerId ? `<@${order.designerId}>` : "-"}`].join("\n")),
       );
       const jump = order.channelId
         ? new ActionRowBuilder<ButtonBuilder>().addComponents(

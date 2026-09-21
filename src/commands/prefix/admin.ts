@@ -26,7 +26,7 @@ const setup: PrefixCommand = {
   execute: async (message) => {
     const guild = message.guild;
     if (!guild) return;
-    await out(message).send({ content: "Running setup — creating roles and channels…" });
+    await out(message).send({ content: "Running setup - creating roles and channels…" });
     const settings = await store().getGuild(guild.id);
 
     const created: string[] = [];
@@ -190,7 +190,7 @@ const service: PrefixCommand = {
     s.serviceStatus[key] = status;
     await store().saveGuild(s);
 
-    // Edit the posted order panel in place — never resend.
+    // Edit the posted order panel in place - never resend.
     let edited = false;
     if (s.orderPanel && message.guild) {
       try {
@@ -209,7 +209,7 @@ const service: PrefixCommand = {
     }
     await out(message).send({
       content: edited
-        ? `**${def.name}** is now **${STATUS[status].label}** — panel updated.`
+        ? `**${def.name}** is now **${STATUS[status].label}** - panel updated.`
         : `**${def.name}** is now **${STATUS[status].label}**. Send the panel with \`!sendorderpanel\` so it can auto-update next time.`,
     });
   },

@@ -12,7 +12,7 @@ export async function deployCommands(): Promise<void> {
   const clientId = process.env.CLIENT_ID;
   const guildId = process.env.GUILD_ID;
   if (!token || !clientId) {
-    log.warn("[deploy] DISCORD_TOKEN / CLIENT_ID missing — skipping command deploy.");
+    log.warn("[deploy] DISCORD_TOKEN / CLIENT_ID missing - skipping command deploy.");
     return;
   }
 
@@ -29,7 +29,7 @@ export async function deployCommands(): Promise<void> {
       return;
     } catch (err: any) {
       if (err?.code === 50001) {
-        log.warn("[deploy] guild registration blocked (missing applications.commands scope) — registering GLOBALLY instead.");
+        log.warn("[deploy] guild registration blocked (missing applications.commands scope) - registering GLOBALLY instead.");
       } else {
         throw err;
       }

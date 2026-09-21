@@ -31,7 +31,7 @@ export async function initStore(): Promise<Store> {
 }
 
 export function store(): Store {
-  if (!instance) throw new Error("Store not initialised — call initStore() first.");
+  if (!instance) throw new Error("Store not initialised - call initStore() first.");
   return instance;
 }
 

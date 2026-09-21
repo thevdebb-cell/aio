@@ -8,6 +8,7 @@ import {
   orderChannelName,
   supportChannelName,
   ticketControls,
+  controlsPanel,
 } from "../../modules/tickets/core.js";
 import { memberHasAnyRole, staffRoleKeysFor } from "../../modules/tickets/handlers.js";
 import type { SupportCategory } from "../../types/types.js";
@@ -101,7 +102,7 @@ export const ticket: SlashCommand = {
         text(`This ticket has been escalated to **${section}** by <@${i.user.id}>. It is now unclaimed for that team.`),
       );
       await channel.send({ flags: V2FLAG, components: [c] });
-      await channel.send({ components: [ticketControls(false)] });
+      await channel.send({ flags: V2FLAG, components: [controlsPanel(false)] });
       await i.reply({ content: "Escalated.", ephemeral: true });
     }
   },

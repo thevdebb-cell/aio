@@ -52,7 +52,7 @@ onButton("rating", async (i: ButtonInteraction, parts) => {
   if (action === "save") {
     const visibility = parts[3]; // "public" | "anon"
     const draft = pending.get(`${i.user.id}:${orderId}`);
-    if (!draft) return void i.reply({ content: "Your review draft expired — start again.", ephemeral: true });
+    if (!draft) return void i.reply({ content: "Your review draft expired - start again.", ephemeral: true });
     pending.delete(`${i.user.id}:${orderId}`);
 
     const anonymous = visibility === "anon";
@@ -83,7 +83,7 @@ onButton("rating", async (i: ButtonInteraction, parts) => {
     // Post to the reviews channel (buyer shown only when public).
     if (i.guild) await postReview(i.guild, orderId!, order.designerId, i.user.id, draft.stars, draft.comment, anonymous);
 
-    await i.update({ components: [], content: "Thanks — your review has been recorded." });
+    await i.update({ components: [], content: "Thanks - your review has been recorded." });
     return;
   }
 });
@@ -133,7 +133,7 @@ async function postReview(guild: Guild, orderId: string, designerId: string | nu
   const who = anonymous ? "Anonymous" : `<@${buyerId}>`;
   const c = container().addTextDisplayComponents(
     text("## Review"),
-    text([`Designer ${designerId ? `<@${designerId}>` : "—"}`, `From ${who}`, `Rating ${starsText(stars)}`, comment ? `Comment ${comment}` : ""].filter(Boolean).join("\n")),
+    text([`Designer ${designerId ? `<@${designerId}>` : "-"}`, `From ${who}`, `Rating ${starsText(stars)}`, comment ? `Comment ${comment}` : ""].filter(Boolean).join("\n")),
   );
   await (chan as TextChannel).send({ flags: V2FLAG, components: [c] }).catch(() => {});
   log.debug(`[ratings] review posted for order ${orderId} (anon=${anonymous})`);

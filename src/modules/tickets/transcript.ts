@@ -10,11 +10,11 @@ export async function buildTranscript(
   ticket: TicketRecord,
 ): Promise<AttachmentBuilder> {
   const lines: string[] = [];
-  lines.push(`Star Customs — ticket transcript`);
+  lines.push(`Star Customs - ticket transcript`);
   lines.push(`Channel: #${channel.name} (${channel.id})`);
   lines.push(`Kind: ${ticket.kind} | Type: ${ticket.type}`);
   lines.push(`Opened by: ${ticket.ownerId}`);
-  lines.push(`Claimed by: ${ticket.claimedBy ?? "—"}`);
+  lines.push(`Claimed by: ${ticket.claimedBy ?? "-"}`);
   if (ticket.orderId) lines.push(`Order: ${ticket.orderId}`);
   lines.push(`Generated: ${new Date().toISOString()}`);
   lines.push("".padEnd(60, "-"));

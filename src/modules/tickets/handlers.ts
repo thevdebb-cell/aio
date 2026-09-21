@@ -15,6 +15,7 @@ import {
   V2,
   orderChannelName,
   ticketControls,
+  controlsPanel,
   ticketOverwrites,
   dmClaimed,
 } from "./core.js";
@@ -174,7 +175,7 @@ async function handleClose(i: ButtonInteraction, isCancel: boolean) {
       if (tChan && tChan.type === ChannelType.GuildText) {
         const file = await buildTranscript(channel, ticket);
         await (tChan as TextChannel).send({
-          content: `Transcript — #${channel.name} (${ticket.kind}/${ticket.type}) — closed by ${member.user.tag}`,
+          content: `Transcript - #${channel.name} (${ticket.kind}/${ticket.type}) - closed by ${member.user.tag}`,
           files: [file],
         });
       }
@@ -192,7 +193,7 @@ async function handleClose(i: ButtonInteraction, isCancel: boolean) {
  * Simpler and robust: just send a new controls panel.
  */
 async function refreshControls(channel: TextChannel, claimed: boolean) {
-  await channel.send({ components: [ticketControls(claimed)] }).catch(() => {});
+  await channel.send({ flags: V2, components: [controlsPanel(claimed)] }).catch(() => {});
 }
 
 log.debug("[tickets] handlers registered");

@@ -35,12 +35,12 @@ function load(): Config {
     );
   }
   if (!real) {
-    console.warn("[config] config.json not found — using config.example.json. Copy it to config.json and fill in your IDs.");
+    console.warn("[config] config.json not found - using config.example.json. Copy it to config.json and fill in your IDs.");
   }
   const cfg = JSON.parse(readFileSync(path, "utf8")) as Config;
 
   if (!Array.isArray(cfg.owners) || cfg.owners.length === 0) {
-    console.warn("[config] no owners configured — owner-only commands will be locked for everyone.");
+    console.warn("[config] no owners configured - owner-only commands will be locked for everyone.");
   }
   return cfg;
 }

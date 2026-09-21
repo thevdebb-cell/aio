@@ -22,7 +22,7 @@ export async function initFileStore(): Promise<FileStore> {
 }
 
 export function files(): FileStore {
-  if (!instance) throw new Error("File store not initialised — call initFileStore() first.");
+  if (!instance) throw new Error("File store not initialised - call initFileStore() first.");
   return instance;
 }
 

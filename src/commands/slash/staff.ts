@@ -138,7 +138,7 @@ const infraction: SlashCommand = {
     if (i.channel && "send" in i.channel) {
       await (i.channel as any).send({ flags: V2FLAG, components: payload.components, files: payload.files }).catch(() => {});
     }
-    await i.editReply({ content: `Infraction issued to <@${user.id}> — case \`${inf.caseId}\`.` });
+    await i.editReply({ content: `Infraction issued to <@${user.id}> - case \`${inf.caseId}\`.` });
   },
 };
 

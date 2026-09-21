@@ -19,7 +19,7 @@ import {
  *
  * See the SQL schema in README.md (section "Supabase schema").
  * The download website can talk to the same project using signed URLs
- * (Supabase Storage) which expire — a perfect fit for the 10-minute links.
+ * (Supabase Storage) which expire - a perfect fit for the 10-minute links.
  */
 export class SupabaseStore implements Store {
   // typed as any so the project compiles without the package installed
@@ -29,7 +29,7 @@ export class SupabaseStore implements Store {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!url || !key) throw new Error("SUPABASE_URL / SUPABASE_SERVICE_KEY are required for the supabase driver.");
-    // @ts-ignore — optional dependency, only present when the owner opts into Supabase
+    // @ts-ignore - optional dependency, only present when the owner opts into Supabase
     const mod = await import("@supabase/supabase-js");
     this.db = mod.createClient(url, key, { auth: { persistSession: false } });
     log.info("[store] supabase store ready");

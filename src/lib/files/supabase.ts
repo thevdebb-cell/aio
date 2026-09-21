@@ -2,7 +2,7 @@ import { log } from "../logger.js";
 import type { FileStore, StoredFileMeta } from "./types.js";
 
 /**
- * Supabase Storage file store. Signed URLs expire natively — pass the TTL you
+ * Supabase Storage file store. Signed URLs expire natively - pass the TTL you
  * want (e.g. 600s) and that's your "valid for 10 minutes" link, no site needed.
  * Your branded download page can also just wrap these signed URLs.
  *
@@ -16,7 +16,7 @@ export class SupabaseFileStore implements FileStore {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!url || !key) throw new Error("SUPABASE_URL / SUPABASE_SERVICE_KEY required for the supabase file store.");
-    // @ts-ignore — optional dependency
+    // @ts-ignore - optional dependency
     const mod = await import("@supabase/supabase-js");
     this.db = mod.createClient(url, key, { auth: { persistSession: false } });
     log.info(`[files] supabase file store ready (bucket ${this.bucket})`);

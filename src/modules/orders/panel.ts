@@ -22,7 +22,7 @@ import { container, text, separator, banner, bannerFiles, bannerExists, e, ASSET
 import { config } from "../../config/config.js";
 import { store, newOrderId } from "../../lib/store/store.js";
 import type { OrderTicketType } from "../../types/types.js";
-import { V2, CHANNEL, ROLE, orderChannelName, ticketControls } from "../tickets/core.js";
+import { V2, CHANNEL, ROLE, orderChannelName, ticketControls, controlsPanel } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
 import { resolvedServices, statusLine, statusOf, STATUS, DEFAULT_STARPLUS_ROLE_ID } from "./status.js";
 import { log } from "../../lib/logger.js";
@@ -37,9 +37,9 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
   if (bannerExists(config.banners.orderTop)) c.addMediaGalleryComponents(banner(config.banners.orderTop));
 
   c.addTextDisplayComponents(
-    text("# Star Customs — Services"),
+    text("# Star Customs - Services"),
     text(
-      "Welcome to the **Star Customs** order desk. We bring your ideas to life — clean, " +
+      "Welcome to the **Star Customs** order desk. We bring your ideas to life - clean, " +
         "professional and on time. Check the live status of each service below, then open " +
         "an order and tell us exactly what you need.",
     ),
@@ -51,10 +51,10 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
 
   // Status legend (uses your wifi emojis when set)
   const legend = [
-    `${e(config.emojis.wifiOnline)} **Online** — available to order now`,
-    `${e(config.emojis.wifiDelayed)} **Star Plus** — reserved for Star Plus members`,
-    `${e(config.emojis.wifiOffline)} **Offline** — temporarily closed, try again later`,
-    `${e(config.emojis.wifiDev)} **Unavailable** — not offered right now`,
+    `${e(config.emojis.wifiOnline)} **Online** - available to order now`,
+    `${e(config.emojis.wifiDelayed)} **Star Plus** - reserved for Star Plus members`,
+    `${e(config.emojis.wifiOffline)} **Offline** - temporarily closed, try again later`,
+    `${e(config.emojis.wifiDev)} **Unavailable** - not offered right now`,
   ].map((l) => l.trimStart());
   c.addTextDisplayComponents(text("## Legend"), text(legend.join("\n")));
   c.addSeparatorComponents(separator(true));
@@ -62,7 +62,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
   c.addTextDisplayComponents(
     text("## How To Order"),
     text(
-      "Pick a service in the menu below and fill in the short form (add your references — " +
+      "Pick a service in the menu below and fill in the short form (add your references - " +
         "especially for graphics). A private order channel is created for you, a designer " +
         "claims it, and everything is tracked with a unique order ID from start to delivery.",
     ),
@@ -111,13 +111,13 @@ onSelect("order", async (i: StringSelectMenuInteraction) => {
     const roleId = config.starPlusRoleId || DEFAULT_STARPLUS_ROLE_ID;
     const member = await i.guild.members.fetch(i.user.id).catch(() => null);
     if (!member || !member.roles.cache.has(roleId)) {
-      await i.reply({ content: "This service is **Star Plus** only — you need the Star Plus role to open it.", ephemeral: true });
+      await i.reply({ content: "This service is **Star Plus** only - you need the Star Plus role to open it.", ephemeral: true });
       return;
     }
   }
 
   const service = resolvedServices(settings).find((s) => s.key === key)!;
-  const modal = new ModalBuilder().setCustomId(cid("order", "submit", key)).setTitle(`Order — ${service.name}`);
+  const modal = new ModalBuilder().setCustomId(cid("order", "submit", key)).setTitle(`Order - ${service.name}`);
   const refRequired = key === "graphic";
   modal.addComponents(
     row(new TextInputBuilder().setCustomId("details").setLabel("What do you need?").setStyle(TextInputStyle.Paragraph).setRequired(true)),
@@ -161,7 +161,7 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
     parentKey: CHANNEL.orderCategory,
     buyerId: i.user.id,
     staffRoleKeys: [ROLE.designer(key)],
-    topic: `Order ${orderId} — ${key} — ${i.user.tag}`,
+    topic: `Order ${orderId} - ${key} - ${i.user.tag}`,
   });
 
   await store().createOrder({
@@ -195,7 +195,7 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
 
   // Intro (Components V2, black).
   const c = container();
-  c.addTextDisplayComponents(text(`## Order ${orderId}`), text(`Service: **${key}** — opened by <@${i.user.id}>.`));
+  c.addTextDisplayComponents(text(`## Order ${orderId}`), text(`Service: **${key}** - opened by <@${i.user.id}>.`));
   c.addSeparatorComponents(separator());
   const lines = [`**Details:**\n${details}`];
   if (references) lines.push(`**References:**\n${references}`);
@@ -203,15 +203,15 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
   c.addTextDisplayComponents(text(lines.join("\n")));
 
   await channel.send({ flags: V2, components: [c] });
-  await channel.send({ components: [ticketControls(false)] });
+  await channel.send({ flags: V2, components: [controlsPanel(false)] });
 
   // Log to the order-logs channel (staff-only, created by setup).
-  await logOrder(i.guild, settings, `Order **${orderId}** opened by ${i.user.tag} — service **${key}** — status: open`);
+  await logOrder(i.guild, settings, `Order **${orderId}** opened by ${i.user.tag} - service **${key}** - status: open`);
 
   // DM the buyer a confirmation with banner.
   await dmOrderCreated(i.user.id, i.guild, orderId, key);
 
-  await i.editReply({ content: `Your order has been created: <#${channel.id}> — ID \`${orderId}\`` });
+  await i.editReply({ content: `Your order has been created: <#${channel.id}> - ID \`${orderId}\`` });
   log.debug(`[orders] ${key} order ${orderId} opened by ${i.user.tag}`);
 });
 

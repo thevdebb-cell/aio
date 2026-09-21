@@ -35,7 +35,7 @@ export const ASSETS_DIR =
 /** Embed/accent colour used everywhere: black. */
 export const BLACK = 0x000000;
 
-/** Components V2 message flag — every panel/embed message uses it. */
+/** Components V2 message flag - every panel/embed message uses it. */
 export const V2FLAG = MessageFlags.IsComponentsV2;
 
 export function text(markdown: string): TextDisplayBuilder {

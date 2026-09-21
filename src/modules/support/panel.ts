@@ -16,7 +16,7 @@ import { container, text, separator, banner, bannerFiles, bannerExists, e } from
 import { config } from "../../config/config.js";
 import { store } from "../../lib/store/store.js";
 import type { SupportCategory } from "../../types/types.js";
-import { V2, CHANNEL, ROLE, supportChannelName, ticketControls } from "../tickets/core.js";
+import { V2, CHANNEL, ROLE, supportChannelName, ticketControls, controlsPanel } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
 import { log } from "../../lib/logger.js";
 
@@ -54,7 +54,7 @@ export function buildSupportPanel(): { components: [ReturnType<typeof container>
         `${dot} Open this ticket for general questions, player assistance, or help with server-related issues.`,
         "",
         "**Order Support**",
-        `${dot} Open this ticket for help with an existing order — include your Order ID if you have one.`,
+        `${dot} Open this ticket for help with an existing order - include your Order ID if you have one.`,
         "",
         "**High Rank Support**",
         `${dot} Use this category for high-priority matters, appeals, or situations that require direct management review.`,
@@ -159,7 +159,7 @@ onModal("support", async (i: ModalSubmitInteraction, parts) => {
     parentKey: CHANNEL.ticketCategory,
     buyerId: i.user.id,
     staffRoleKeys: meta.staffKeys,
-    topic: `${meta.label} — opened by ${i.user.tag}`,
+    topic: `${meta.label} - opened by ${i.user.tag}`,
   });
 
   await store().createTicket({
@@ -184,13 +184,13 @@ onModal("support", async (i: ModalSubmitInteraction, parts) => {
   if (target) details.push(`**Report target:** ${target}`);
   if (orderId) {
     const order = await store().getOrder(orderId);
-    details.push(`**Order ID:** ${orderId}${order ? ` — status: ${order.status}` : " (not found)"}`);
+    details.push(`**Order ID:** ${orderId}${order ? ` - status: ${order.status}` : " (not found)"}`);
   }
   if (inquiry) details.push(`**Inquiry:**\n${inquiry}`);
   if (details.length) c.addTextDisplayComponents(text(details.join("\n")));
 
   await channel.send({ flags: V2, components: [c] });
-  await channel.send({ components: [ticketControls(false)] });
+  await channel.send({ flags: V2, components: [controlsPanel(false)] });
 
   await i.editReply({ content: `Your ticket has been created: <#${channel.id}>` });
   log.debug(`[support] ${value} ticket opened by ${i.user.tag} -> #${channel.name}`);

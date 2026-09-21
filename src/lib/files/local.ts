@@ -34,7 +34,7 @@ export class LocalFileStore implements FileStore {
       }
     }
     if (!process.env.DOWNLOAD_SECRET) {
-      log.warn("[files] DOWNLOAD_SECRET not set — download links won't survive a restart. Set it for production.");
+      log.warn("[files] DOWNLOAD_SECRET not set - download links won't survive a restart. Set it for production.");
     }
     this.startServer();
     log.info(`[files] local file store ready (serving on ${this.publicUrl})`);

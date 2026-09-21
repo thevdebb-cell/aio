@@ -63,7 +63,7 @@ async function strike(guild: Guild, userId: string, reason: string) {
   const k = key(guild.id, userId);
   const count = (strikes.get(k) ?? 0) + 1;
   strikes.set(k, count);
-  log.warn(`[antinuke] strike ${count}/${QUARANTINE_STRIKES} for ${userId} — ${reason}`);
+  log.warn(`[antinuke] strike ${count}/${QUARANTINE_STRIKES} for ${userId} - ${reason}`);
 
   if (count >= QUARANTINE_STRIKES) {
     strikes.delete(k);
@@ -72,7 +72,7 @@ async function strike(guild: Guild, userId: string, reason: string) {
     await dm(
       guild,
       userId,
-      `Warning (${count}/${QUARANTINE_STRIKES}): unauthorized action detected — ${reason}. ` +
+      `Warning (${count}/${QUARANTINE_STRIKES}): unauthorized action detected - ${reason}. ` +
         `Continuing will get you quarantined and timed out.`,
     );
   }
@@ -104,7 +104,7 @@ export async function onMemberAdd(member: GuildMember) {
   if (!member.user.bot) return;
   const adder = await executorOf(member.guild, AuditLogEvent.BotAdd, member.id);
   if (adder && !isOwner(adder)) {
-    log.warn(`[antinuke] non-owner ${adder} added bot ${member.user.tag} — kicking bot`);
+    log.warn(`[antinuke] non-owner ${adder} added bot ${member.user.tag} - kicking bot`);
     await member.kick("Anti-nuke: bots may only be added by an owner").catch(() => {});
     await strike(member.guild, adder, "adding a bot");
   }
@@ -115,7 +115,7 @@ export async function onChannelCreate(channel: NonThreadGuildBasedChannel) {
   const guild = channel.guild;
   const who = await executorOf(guild, AuditLogEvent.ChannelCreate, channel.id);
   if (untrusted(who, guild)) {
-    log.warn(`[antinuke] ${who} created #${channel.name} — deleting`);
+    log.warn(`[antinuke] ${who} created #${channel.name} - deleting`);
     await channel.delete("Anti-nuke: unauthorized channel creation").catch(() => {});
     await strike(guild, who!, "creating a channel");
   }
@@ -127,7 +127,7 @@ export async function onChannelDelete(channel: NonThreadGuildBasedChannel) {
   const who = await executorOf(guild, AuditLogEvent.ChannelDelete, channel.id);
   if (!untrusted(who, guild)) return;
 
-  log.warn(`[antinuke] ${who} deleted #${channel.name} — restoring`);
+  log.warn(`[antinuke] ${who} deleted #${channel.name} - restoring`);
   try {
     await guild.channels.create({
       name: channel.name,
@@ -164,7 +164,7 @@ export async function onChannelUpdate(
     "topic" in oldChannel && "topic" in newChannel && oldChannel.topic !== newChannel.topic;
   if (!nameChanged && !topicChanged) return;
 
-  log.warn(`[antinuke] ${who} edited #${newChannel.name} — reverting`);
+  log.warn(`[antinuke] ${who} edited #${newChannel.name} - reverting`);
   try {
     if (nameChanged) await newChannel.setName(oldChannel.name, "Anti-nuke: revert").catch(() => {});
     if (topicChanged && "setTopic" in newChannel) {
