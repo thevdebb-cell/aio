@@ -46,6 +46,18 @@ html[data-theme="light"] {
 }
 
 html, body { height: 100%; }
+
+#top-notice {
+  text-align: center;
+  background: #7a1520;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-bottom: 1px solid #5a0e17;
+}
 body {
   margin: 0;
   background: var(--bg);
