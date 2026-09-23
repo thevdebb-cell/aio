@@ -3,6 +3,7 @@ import { defineEvent } from "../lib/framework.js";
 import { onMemberJoin } from "../modules/welcome/welcome.js";
 import { onMemberAdd as antinukeMemberAdd } from "../modules/antinuke/antinuke.js";
 import { applyAutoRoles } from "../modules/autorole/autorole.js";
+import { logMemberJoin } from "../modules/logging/logging.js";
 
 export default defineEvent({
   name: Events.GuildMemberAdd,
@@ -10,6 +11,7 @@ export default defineEvent({
     // Anti-nuke first (kick unauthorized bots before welcoming them).
     await antinukeMemberAdd(member);
     if (member.user.bot) return;
+    await logMemberJoin(member.guild, member.id, member.user.tag);
     await applyAutoRoles(member);
     await onMemberJoin(member);
   },
