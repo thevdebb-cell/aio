@@ -1,6 +1,6 @@
 // ── Shared domain types ─────────────────────────────────
 
-export type ServiceStatus = "on" | "starplus" | "closed" | "unavail";
+export type ServiceStatus = "on" | "starplus" | "closed" | "delayed";
 
 export interface ServiceDef {
   /** stable key used by !service and internally (e.g. "graphic") */

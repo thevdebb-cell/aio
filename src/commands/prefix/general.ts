@@ -9,7 +9,7 @@ const ping: PrefixCommand = {
   execute: async (message) => {
     const sent = await out(message).send({ content: "Pinging…" });
     const rtt = sent.createdTimestamp - message.createdTimestamp;
-    await sent.edit({ content: `Pong. Latency ${rtt}ms · API ${Math.round(message.client.ws.ping)}ms` });
+    await sent.edit({ content: `Ping. Latency ${rtt}ms · API ${Math.round(message.client.ws.ping)}ms` });
   },
 };
 
@@ -30,7 +30,7 @@ const commands: PrefixCommand = {
           "`!avatar [user]` - a user's avatar",
           "",
           "**Whitelist**",
-          "`!service <service> <on|delay|closed|unavail>` - set a service status",
+          "`!service <service> <on|starplus|closed|delayed>` - set a service status",
           "`/say <message> [channel]` - speak as the bot",
           "",
           "**Owner**",

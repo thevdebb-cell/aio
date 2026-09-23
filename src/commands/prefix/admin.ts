@@ -165,13 +165,13 @@ const STATUS_ALIASES: Record<string, ServiceStatus> = {
   star: "starplus",
   closed: "closed",
   offline: "closed",
-  unavail: "unavail",
-  unavailable: "unavail",
+  delay: "delayed",
+  delayed: "delayed",
 };
 
 const service: PrefixCommand = {
   name: "service",
-  description: "Set a service status: !service <service> <on|starplus|closed|unavail>",
+  description: "Set a service status: !service <service> <on|starplus|closed|delayed>",
   whitelistOnly: true,
   execute: async (message, args) => {
     if (!message.guild) return;
@@ -182,7 +182,7 @@ const service: PrefixCommand = {
     if (!def || !status) {
       const services = config.services.map((s) => s.key).join(", ");
       await out(message).send({
-        content: `Usage: \`!service <service> <on|starplus|closed|unavail>\`\nServices: ${services}`,
+        content: `Usage: \`!service <service> <on|starplus|closed|delayed>\`\nServices: ${services}`,
       });
       return;
     }

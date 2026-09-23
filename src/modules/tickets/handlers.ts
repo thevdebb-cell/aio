@@ -12,15 +12,31 @@ import { log } from "../../lib/logger.js";
 import {
   ROLE,
   CHANNEL,
-  V2,
+  SUPPORT_PREFIX,
   orderChannelName,
-  ticketControls,
-  controlsPanel,
+  supportChannelName,
+  editControlsPanel,
   ticketOverwrites,
   dmClaimed,
 } from "./core.js";
-import { container, text } from "../../lib/ui.js";
+import type { GuildSettings as GS } from "../../lib/store/types.js";
 import { buildTranscript } from "./transcript.js";
+
+/** Resolve the team role that owns a ticket (designer role for orders, support/HR for support). */
+function teamRoleId(ticket: TicketRecord, settings: GS): string | null {
+  const key = staffRoleKeysFor(ticket)[0];
+  return key ? (settings.roles[key] ?? null) : null;
+}
+
+/** Rename a ticket channel for the given claim state (orders and support both get the emoji lead). */
+async function renameForClaim(channel: TextChannel, ticket: TicketRecord, claimed: boolean, designer?: string, ownerName?: string, queue?: number) {
+  if (ticket.kind === "order") {
+    await channel.setName(orderChannelName({ claimed, type: ticket.type, user: ownerName ?? "user", designer, queue })).catch(() => {});
+  } else {
+    const prefix = SUPPORT_PREFIX[ticket.type] ?? ticket.type;
+    await channel.setName(supportChannelName(prefix, ownerName ?? "user", { claimed, designer })).catch(() => {});
+  }
+}
 
 /** Which role keys are allowed to claim/act on a ticket of this type. */
 export function staffRoleKeysFor(ticket: TicketRecord): string[] {
@@ -100,20 +116,19 @@ async function handleClaim(i: ButtonInteraction) {
       extraUserIds: ticket.addedUsers,
     }),
   );
-  if (ticket.kind === "order") {
-    await channel
-      .setName(orderChannelName({ claimed: true, type: ticket.type, user: ticket.ownerId, designer: member.user.username, queue }))
-      .catch(() => {});
-  }
+  const opener = await i.guild!.members.fetch(ticket.ownerId).catch(() => null);
+  const ownerName = opener?.user.username ?? "user";
+  await renameForClaim(channel, ticket, true, member.user.username, ownerName, queue);
 
-  // Refresh the control panel (unclaim/close now shown).
-  await refreshControls(channel, true);
+  // Edit the ONE control panel in place (claimed note + close button) - never resend.
+  await editControlsPanel(channel, ticket.panelMessageId, { claimed: true, claimerId: member.id });
 
   // DM the opener.
-  const opener = await i.guild!.members.fetch(ticket.ownerId).catch(() => null);
   if (opener) await dmClaimed(opener, channel, member.user.tag);
 
-  await channel.send({ flags: V2, components: [container().addTextDisplayComponents(text(`Claimed by **${member.user.tag}**.`))] });
+  // Small plain (non-embed, no buttons) claim notice.
+  const label = ticket.kind === "order" ? "Order" : "Ticket";
+  await channel.send({ content: `${label} claimed by <@${member.id}>`, allowedMentions: { parse: [] } }).catch(() => {});
 }
 
 async function handleUnclaim(i: ButtonInteraction) {
@@ -140,11 +155,13 @@ async function handleUnclaim(i: ButtonInteraction) {
       extraUserIds: ticket.addedUsers,
     }),
   );
-  if (ticket.kind === "order") {
-    await channel.setName(orderChannelName({ claimed: false, type: ticket.type, user: ticket.ownerId })).catch(() => {});
-  }
-  await refreshControls(channel, false);
-  await channel.send({ flags: V2, components: [container().addTextDisplayComponents(text(`Unclaimed by **${member.user.tag}**. Available to claim again.`))] });
+  const opener = await i.guild!.members.fetch(ticket.ownerId).catch(() => null);
+  const ownerName = opener?.user.username ?? "user";
+  await renameForClaim(channel, ticket, false, undefined, ownerName);
+
+  // Edit the panel back to unclaimed and re-ping the team.
+  await editControlsPanel(channel, ticket.panelMessageId, { claimed: false, pingRoleId: teamRoleId(ticket, settings) });
+  await channel.send({ content: `Unclaimed by <@${member.id}> - available to claim again`, allowedMentions: { parse: [] } }).catch(() => {});
 }
 
 async function handleClose(i: ButtonInteraction, isCancel: boolean) {
@@ -186,14 +203,6 @@ async function handleClose(i: ButtonInteraction, isCancel: boolean) {
 
   await store().deleteTicket(channel.id);
   await channel.delete().catch(() => {});
-}
-
-/**
- * Replace the last control message in the channel with a fresh one.
- * Simpler and robust: just send a new controls panel.
- */
-async function refreshControls(channel: TextChannel, claimed: boolean) {
-  await channel.send({ flags: V2, components: [controlsPanel(claimed)] }).catch(() => {});
 }
 
 log.debug("[tickets] handlers registered");

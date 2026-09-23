@@ -55,9 +55,32 @@ export function sanitize(s: string): string {
   );
 }
 
-/** Channel name for a support ticket: "<category>-<user>". */
-export function supportChannelName(categoryPrefix: string, username: string): string {
-  return `${categoryPrefix}-${sanitize(username)}`.slice(0, 90);
+/** Logical channel-name prefix per support category. */
+export const SUPPORT_PREFIX: Record<string, string> = {
+  general: "general",
+  order: "order",
+  highrank: "management",
+  management: "management",
+  report: "report",
+  bug: "bug",
+};
+
+/**
+ * Channel name for a support ticket, with the same claimed/unclaimed emoji lead
+ * as order channels.
+ * Unclaimed: "<emoji>ㆍ<category>-<user>"
+ * Claimed:   "<emoji>ㆍ<category>-<claimer>"
+ */
+export function supportChannelName(
+  categoryPrefix: string,
+  username: string,
+  opts?: { claimed?: boolean; designer?: string },
+): string {
+  const claimed = opts?.claimed ?? false;
+  const emoji = claimed ? e(config.emojis.orderClaimed) : e(config.emojis.orderUnclaimed);
+  const lead = emoji ? `${emoji}ㆍ` : "";
+  const who = claimed ? sanitize(opts?.designer ?? "staff") : sanitize(username);
+  return `${lead}${categoryPrefix}-${who}`.slice(0, 90);
 }
 
 /**
@@ -141,12 +164,46 @@ export function ticketControls(claimed: boolean): ActionRowBuilder<ButtonBuilder
   return row;
 }
 
-/** A Components V2 box that holds the ticket buttons INSIDE it (grey). */
-export function controlsPanel(claimed: boolean) {
-  return container()
-    .addTextDisplayComponents(text("## Ticket Controls"))
-    .addSeparatorComponents(separator())
-    .addActionRowComponents(ticketControls(claimed));
+export interface PanelOpts {
+  claimed: boolean;
+  claimerId?: string | null;
+  /** role pinged (unclaimed only) so the team is notified a ticket is waiting */
+  pingRoleId?: string | null;
+}
+
+/**
+ * A Components V2 box holding the grey ticket buttons INSIDE it. When unclaimed
+ * it pings the team role; when claimed it shows a "Claimed by" note and keeps
+ * the Close/Unclaim buttons. This ONE message is edited in place on claim.
+ */
+export function controlsPanel(opts: PanelOpts | boolean) {
+  const o: PanelOpts = typeof opts === "boolean" ? { claimed: opts } : opts;
+  const c = container();
+  if (!o.claimed && o.pingRoleId) c.addTextDisplayComponents(text(`<@&${o.pingRoleId}>`));
+  c.addTextDisplayComponents(text("## Ticket Controls"));
+  c.addTextDisplayComponents(text(o.claimed && o.claimerId ? `Claimed by <@${o.claimerId}>` : "Waiting to be claimed"));
+  c.addSeparatorComponents(separator());
+  c.addActionRowComponents(ticketControls(o.claimed));
+  return c;
+}
+
+/** Send the control panel and return the message (so its id can be stored). */
+export async function sendControlsPanel(channel: TextChannel, opts: PanelOpts) {
+  return channel.send({
+    flags: V2,
+    components: [controlsPanel(opts)],
+    allowedMentions: opts.pingRoleId ? { roles: [opts.pingRoleId] } : { parse: [] },
+  });
+}
+
+/** Edit the stored control panel in place (claim/unclaim), never resend. */
+export async function editControlsPanel(channel: TextChannel, messageId: string | null | undefined, opts: PanelOpts) {
+  if (!messageId) return;
+  const msg = await channel.messages.fetch(messageId).catch(() => null);
+  if (!msg) return;
+  await msg
+    .edit({ flags: V2, components: [controlsPanel(opts)], allowedMentions: opts.pingRoleId ? { roles: [opts.pingRoleId] } : { parse: [] } })
+    .catch(() => {});
 }
 
 function bannerFile(name: string): AttachmentBuilder[] {

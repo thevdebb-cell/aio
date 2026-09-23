@@ -7,8 +7,7 @@ import {
   ticketOverwrites,
   orderChannelName,
   supportChannelName,
-  ticketControls,
-  controlsPanel,
+  sendControlsPanel,
 } from "../../modules/tickets/core.js";
 import { memberHasAnyRole, staffRoleKeysFor } from "../../modules/tickets/handlers.js";
 import type { SupportCategory } from "../../types/types.js";
@@ -38,7 +37,7 @@ export const ticket: SlashCommand = {
             .setDescription("Target section")
             .setRequired(true)
             .addChoices(
-              { name: "High Rank", value: "highrank" },
+              { name: "Management", value: "highrank" },
               { name: "General", value: "general" },
               { name: "Order", value: "order" },
               { name: "Report", value: "report" },
@@ -102,7 +101,9 @@ export const ticket: SlashCommand = {
         text(`This ticket has been escalated to **${section}** by <@${i.user.id}>. It is now unclaimed for that team.`),
       );
       await channel.send({ flags: V2FLAG, components: [c] });
-      await channel.send({ flags: V2FLAG, components: [controlsPanel(false)] });
+      const pingRoleId = settings.roles[keys[0] ?? ""] ?? null;
+      const panel = await sendControlsPanel(channel, { claimed: false, pingRoleId });
+      await store().updateTicket(channel.id, { panelMessageId: panel.id });
       await i.reply({ content: "Escalated.", ephemeral: true });
     }
   },

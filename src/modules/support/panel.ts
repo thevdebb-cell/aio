@@ -16,7 +16,7 @@ import { container, text, separator, banner, bannerFiles, bannerExists, e } from
 import { config } from "../../config/config.js";
 import { store } from "../../lib/store/store.js";
 import type { SupportCategory } from "../../types/types.js";
-import { V2, CHANNEL, ROLE, supportChannelName, ticketControls, controlsPanel } from "../tickets/core.js";
+import { V2, CHANNEL, ROLE, supportChannelName, sendControlsPanel } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
 import { log } from "../../lib/logger.js";
 
@@ -31,7 +31,7 @@ interface CatMeta {
 const CATEGORIES: CatMeta[] = [
   { value: "general", label: "General Support", description: "Questions and general help.", prefix: "general", staffKeys: [ROLE.support] },
   { value: "order", label: "Order Support", description: "Help with an existing order.", prefix: "order", staffKeys: [ROLE.support] },
-  { value: "highrank", label: "High Rank Support", description: "Reach the management team.", prefix: "management", staffKeys: [ROLE.highrank] },
+  { value: "highrank", label: "Management", description: "Reach the management team.", prefix: "management", staffKeys: [ROLE.highrank] },
   { value: "report", label: "Report", description: "Report a user or an issue.", prefix: "report", staffKeys: [ROLE.support] },
   { value: "bug", label: "Bug Report", description: "Tell us about a bug.", prefix: "bug", staffKeys: [ROLE.support] },
 ];
@@ -56,7 +56,7 @@ export function buildSupportPanel(): { components: [ReturnType<typeof container>
         "**Order Support**",
         `${dot} Open this ticket for help with an existing order - include your Order ID if you have one.`,
         "",
-        "**High Rank Support**",
+        "**Management**",
         `${dot} Use this category for high-priority matters, appeals, or situations that require direct management review.`,
         "",
         "**Report**",
@@ -190,7 +190,9 @@ onModal("support", async (i: ModalSubmitInteraction, parts) => {
   if (details.length) c.addTextDisplayComponents(text(details.join("\n")));
 
   await channel.send({ flags: V2, components: [c] });
-  await channel.send({ flags: V2, components: [controlsPanel(false)] });
+  const pingRoleId = settings.roles[meta.staffKeys[0] ?? ""] ?? null;
+  const panel = await sendControlsPanel(channel, { claimed: false, pingRoleId });
+  await store().updateTicket(channel.id, { panelMessageId: panel.id });
 
   await i.editReply({ content: `Your ticket has been created: <#${channel.id}>` });
   log.debug(`[support] ${value} ticket opened by ${i.user.tag} -> #${channel.name}`);

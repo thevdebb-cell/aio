@@ -4,6 +4,7 @@ import interactionCreate from "./interactionCreate.js";
 import messageCreate from "./messageCreate.js";
 import guildMemberAdd from "./guildMemberAdd.js";
 import { channelCreateEvent, channelDeleteEvent, channelUpdateEvent } from "./channels.js";
+import { roleCreateEvent, roleDeleteEvent, roleUpdateEvent } from "./roles.js";
 
 export const events: BotEvent[] = [
   ready,
@@ -13,4 +14,7 @@ export const events: BotEvent[] = [
   channelCreateEvent,
   channelDeleteEvent,
   channelUpdateEvent,
+  roleCreateEvent,
+  roleDeleteEvent,
+  roleUpdateEvent,
 ] as BotEvent[];

@@ -13,7 +13,7 @@ export const STATUS: Record<ServiceStatus, StatusMeta> = {
   on: { label: "Online", emojiKey: "wifiOnline", selectable: true },
   starplus: { label: "Star Plus", emojiKey: "wifiDelayed", selectable: true }, // orange - only the Star Plus role may open
   closed: { label: "Offline", emojiKey: "wifiOffline", selectable: true }, // selectable, but shows a "closed" notice
-  unavail: { label: "Unavailable", emojiKey: "wifiDev", selectable: false },
+  delayed: { label: "Delayed", emojiKey: "wifiDev", selectable: false }, // grey - shown as delayed, not orderable
 };
 
 /** Hardcoded default Star Plus role (overridable via config.starPlusRoleId). */

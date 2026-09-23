@@ -24,6 +24,8 @@ export interface TicketRecord {
   createdAt: number;
   addedUsers: string[];
   orderId: string | null; // linked order (order tickets)
+  /** id of the control panel message, so claim/unclaim edit it in place */
+  panelMessageId?: string | null;
 }
 
 export interface RatingRecord {

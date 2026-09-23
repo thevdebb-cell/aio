@@ -20,9 +20,11 @@ import { onButton, cid } from "../../lib/interactions.js";
 import { recordAndLog } from "../../modules/moderation/util.js";
 import { isOwner } from "../../config/config.js";
 
-const INFRACT_BLUE = 0x3b6fb0;
 const INFRACT_GREY = 0x4a4a52;
 const BANNER = "INFRACTIONS.png";
+
+/** Preset infraction types - chosen from a menu, never typed. */
+const INFRACTION_TYPES = ["Notice", "Warning", "Strike", "Suspension", "Termination", "Demotion", "Blacklist"] as const;
 
 async function gateHr(i: ChatInputCommandInteraction): Promise<boolean> {
   if (!i.guild) return false;
@@ -50,20 +52,28 @@ function bannerFiles(): AttachmentBuilder[] {
   return existsSync(p) ? [new AttachmentBuilder(p, { name: BANNER })] : [];
 }
 
-function buildInfraction(inf: {
-  caseId: string;
-  category: string;
-  type: string;
-  reason: string;
-  userId: string;
-  issuedById: string;
-  notes: string;
-  expiration: string;
-  proof: string;
-  revokedBy?: string | null;
-}) {
+/**
+ * Build the infraction as a single Components V2 container (black, no footer):
+ * title -> description -> details -> banner -> revoke button, all INSIDE the box.
+ * withButton is false for the DM copy (no controls in DMs).
+ */
+function buildInfraction(
+  inf: {
+    caseId: string;
+    category: string;
+    type: string;
+    reason: string;
+    userId: string;
+    issuedById: string;
+    notes: string;
+    expiration: string;
+    proof: string;
+    revokedBy?: string | null;
+  },
+  withButton: boolean,
+) {
   const revoked = Boolean(inf.revokedBy);
-  const title = revoked ? "Staff Infraction - Revoked" : `Staff Infraction${inf.category === "Abuse" ? " - Abuse" : inf.category === "HI Case" ? " - HI" : ""}`;
+  const title = revoked ? "Star Customs - Staff Infraction Revoked" : "Star Customs - Staff Infraction";
   const lines = [
     `**Infraction Type:** ${inf.type}`,
     `**Reason:** ${inf.reason}`,
@@ -76,19 +86,25 @@ function buildInfraction(inf: {
   lines.push(`**Case ID:** ${inf.caseId}`);
   if (revoked) lines.push(`\n**This infraction has been revoked by <@${inf.revokedBy}>**`);
 
+  // container() is black by default; revoked goes grey.
   const c = container()
-    .setAccentColor(revoked ? INFRACT_GREY : INFRACT_BLUE)
     .addTextDisplayComponents(text(`## ${title}`), text(infractionDescription(inf.category)))
     .addSeparatorComponents(separator())
     .addTextDisplayComponents(text(lines.join("\n")));
+  if (revoked) c.setAccentColor(INFRACT_GREY);
 
   const files = bannerFiles();
   if (files.length) c.addMediaGalleryComponents(new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(`attachment://${BANNER}`)));
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(revoked ? "Revoked" : "Revoke").setCustomId(cid("infract", "revoke", inf.caseId)).setDisabled(revoked),
-  );
-  return { components: [c, row], files };
+  // Revoke button INSIDE the container, at the bottom.
+  if (withButton) {
+    c.addActionRowComponents(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(revoked ? "Revoked" : "Revoke").setCustomId(cid("infract", "revoke", inf.caseId)).setDisabled(revoked),
+      ),
+    );
+  }
+  return { component: c, files };
 }
 
 const infraction: SlashCommand = {
@@ -100,7 +116,13 @@ const infraction: SlashCommand = {
         .setName("issue")
         .setDescription("Issue a staff infraction")
         .addUserOption((o) => o.setName("user").setDescription("Staff member").setRequired(true))
-        .addStringOption((o) => o.setName("type").setDescription("Infraction type (e.g. Warning, Strike, Suspension)").setRequired(true))
+        .addStringOption((o) =>
+          o
+            .setName("type")
+            .setDescription("Infraction type")
+            .setRequired(true)
+            .addChoices(...INFRACTION_TYPES.map((t) => ({ name: t, value: t }))),
+        )
         .addStringOption((o) => o.setName("reason").setDescription("Reason").setRequired(true))
         .addStringOption((o) =>
           o.setName("category").setDescription("Category").addChoices({ name: "Normal", value: "Normal" }, { name: "HI Case", value: "HI Case" }, { name: "Abuse", value: "Abuse" }),
@@ -131,12 +153,13 @@ const infraction: SlashCommand = {
       "Infraction Issued",
     );
 
-    const payload = buildInfraction(inf);
     // DM the user (no buttons in DM).
-    await i.guild!.members.fetch(user.id).then((m) => m.send({ flags: V2FLAG, components: [payload.components[0]], files: payload.files }).catch(() => {})).catch(() => {});
-    // Post in the current channel with the revoke button.
+    const dm = buildInfraction(inf, false);
+    await i.guild!.members.fetch(user.id).then((m) => m.send({ flags: V2FLAG, components: [dm.component], files: dm.files }).catch(() => {})).catch(() => {});
+    // Post in the current channel with the revoke button inside the box.
+    const posted = buildInfraction(inf, true);
     if (i.channel && "send" in i.channel) {
-      await (i.channel as any).send({ flags: V2FLAG, components: payload.components, files: payload.files }).catch(() => {});
+      await (i.channel as any).send({ flags: V2FLAG, components: [posted.component], files: posted.files }).catch(() => {});
     }
     await i.editReply({ content: `Infraction issued to <@${user.id}> - case \`${inf.caseId}\`.` });
   },

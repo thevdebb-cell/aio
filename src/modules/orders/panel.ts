@@ -22,7 +22,7 @@ import { container, text, separator, banner, bannerFiles, bannerExists, e, ASSET
 import { config } from "../../config/config.js";
 import { store, newOrderId } from "../../lib/store/store.js";
 import type { OrderTicketType } from "../../types/types.js";
-import { V2, CHANNEL, ROLE, orderChannelName, ticketControls, controlsPanel } from "../tickets/core.js";
+import { V2, CHANNEL, ROLE, orderChannelName, sendControlsPanel } from "../tickets/core.js";
 import { createTicketChannel } from "../tickets/create.js";
 import { resolvedServices, statusLine, statusOf, STATUS, DEFAULT_STARPLUS_ROLE_ID } from "./status.js";
 import { log } from "../../lib/logger.js";
@@ -54,7 +54,7 @@ export async function buildOrderPanel(guildId: string): Promise<{ components: [R
     `${e(config.emojis.wifiOnline)} **Online** - available to order now`,
     `${e(config.emojis.wifiDelayed)} **Star Plus** - reserved for Star Plus members`,
     `${e(config.emojis.wifiOffline)} **Offline** - temporarily closed, try again later`,
-    `${e(config.emojis.wifiDev)} **Unavailable** - not offered right now`,
+    `${e(config.emojis.wifiDev)} **Delayed** - not orderable right now, coming back soon`,
   ].map((l) => l.trimStart());
   c.addTextDisplayComponents(text("## Legend"), text(legend.join("\n")));
   c.addSeparatorComponents(separator(true));
@@ -99,8 +99,8 @@ onSelect("order", async (i: StringSelectMenuInteraction) => {
 
   const settings = await store().getGuild(i.guild.id);
   const status = statusOf(settings, key);
-  if (!status || status === "unavail") {
-    await i.reply({ content: "That service is unavailable and can't be ordered.", ephemeral: true });
+  if (!status || status === "delayed") {
+    await i.reply({ content: "That service is currently delayed and can't be ordered right now.", ephemeral: true });
     return;
   }
   if (status === "closed") {
@@ -143,7 +143,7 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
 
   const settings = await store().getGuild(i.guild.id);
   const status = statusOf(settings, key);
-  if (!status || status === "unavail" || status === "closed") {
+  if (!status || status === "delayed" || status === "closed") {
     await i.reply({ content: "This service can't be ordered right now.", ephemeral: true });
     return;
   }
@@ -203,7 +203,9 @@ onModal("order", async (i: ModalSubmitInteraction, parts) => {
   c.addTextDisplayComponents(text(lines.join("\n")));
 
   await channel.send({ flags: V2, components: [c] });
-  await channel.send({ flags: V2, components: [controlsPanel(false)] });
+  const pingRoleId = settings.roles[ROLE.designer(key)] ?? null;
+  const panel = await sendControlsPanel(channel, { claimed: false, pingRoleId });
+  await store().updateTicket(channel.id, { panelMessageId: panel.id });
 
   // Log to the order-logs channel (staff-only, created by setup).
   await logOrder(i.guild, settings, `Order **${orderId}** opened by ${i.user.tag} - service **${key}** - status: open`);
