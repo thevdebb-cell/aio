@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BLS Hosting Access</title>
+<link rel="icon" href="/img/bls-logo.png">
+<link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <img src="/img/bls-hosting.png" alt="" class="brandimg">
+    <div>
+      <h1>BLS Hosting</h1>
+      <div class="sub">Internal service · dev only</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <form class="form" id="form" autocomplete="off">
+    <label for="code">Access code</label>
+    <input type="password" id="code" name="code" required autocomplete="off" autocapitalize="off" spellcheck="false" autofocus>
+    <button class="go" type="submit" id="submit">Enter</button>
+    <div class="msg" id="msg" role="alert" aria-live="assertive"></div>
+  </form>
+
+  <hr>
+
+  <p class="contact-intro">Need a code  ask one of them</p>
+  <table>
+    <thead>
+      <tr><th>Contact</th><th>Discord</th><th>Email</th></tr>
+    </thead>
+    <tbody id="contacts"></tbody>
+  </table>
+
+  <div class="notice"><a class="back" href="/">Back to the portal</a></div>
+</div>
+<script src="/js/access.js"></script>
+</body>
+</html>

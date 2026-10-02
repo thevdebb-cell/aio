@@ -1,0 +1,9 @@
+node_modules/
+.env
+data/
+deployments/
+runtimes/
+logs/
+uploads/
+tmp/
+*.log

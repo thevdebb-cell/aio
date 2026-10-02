@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BLS Hosting Panel</title>
+<link rel="icon" href="/img/bls-logo.png">
+<link rel="stylesheet" href="/css/panel.css">
+</head>
+<body>
+<div class="shell">
+  <div class="brand">
+    <img src="/img/bls-logo.png" alt="" id="brandLogo">
+    <span class="title">BLS.Hosting</span>
+  </div>
+
+  <div class="topbar">
+    <span class="chip" id="noticeChip">internal dev only</span>
+    <span class="chip" id="hostChip">loading</span>
+    <span class="spacer"></span>
+    <button class="ghost sm" id="themeBtn" title="Switch theme">Theme system</button>
+    <span class="chip accent" id="roleChip">role</span>
+    <button class="sm" id="signOutBtn">Sign out</button>
+  </div>
+
+  <nav class="side" id="side" aria-label="Sections"></nav>
+  <main class="main" id="main"></main>
+</div>
+<script type="module" src="/js/panel.js"></script>
+</body>
+</html>

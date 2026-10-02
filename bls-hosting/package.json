@@ -1,0 +1,23 @@
+{
+  "name": "bls-hosting",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BLS.Hosting internal bot hosting panel",
+  "type": "commonjs",
+  "main": "bin/bls.js",
+  "scripts": {
+    "start": "node bin/bls.js",
+    "dev": "node bin/bls.js",
+    "seed": "node scripts/seed.js",
+    "check": "node scripts/check.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "fflate": "^0.8.2",
+    "multer": "^2.0.2",
+    "ws": "^8.18.3"
+  }
+}
