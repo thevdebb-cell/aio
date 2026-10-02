@@ -74,17 +74,23 @@ The installer does the rest:
 
 ### The DNS record
 
-In the OVH control panel under **Web Cloud → Domain names → blociapps.com → DNS
-zone**:
+`blociapps.com` is registered at **IONOS**, so the DNS zone lives there — not at
+OVH, which only hosts the VPS. In the IONOS control panel under **Domains & SSL →
+blociapps.com → DNS**:
 
-| Type | Name | Target |
+| Type | Name | Value |
 |---|---|---|
 | A | `bls` | your VPS IPv4 |
+| CAA | `@` | `0 issue "letsencrypt.org"` |
+
+The CAA record is not required but it is worth the thirty seconds: it tells every
+certificate authority on earth that only Let's Encrypt may issue certificates for
+this domain, which shuts the door on a whole class of abuse.
 
 Caddy asks Let's Encrypt for the certificate on the first visit, so give it a
 minute after the record resolves. If the OVH **network** firewall is enabled in
-the control panel, remember it is a second layer — port 80 and 443 must be open
-there too, or validation times out.
+the OVH control panel, remember it is a second layer in front of the VPS — port
+80 and 443 must be open there too, or validation times out.
 
 ### Your icons
 
