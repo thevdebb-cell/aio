@@ -303,7 +303,6 @@ $Domain {
     encode gzip
 
     reverse_proxy 127.0.0.1:$Port {
-        header_up X-Forwarded-Proto {scheme}
         header_up X-Real-IP {remote_host}
     }
 
@@ -323,6 +322,8 @@ $Domain {
     Good "wrote $caddyfile"
 
     New-Item -Path (Join-Path $Root 'logs\caddy') -ItemType Directory -Force | Out-Null
+    # caddy indents with tabs  let it rewrite the file so it stops warning on every start
+    Invoke-Native -Exe $caddy -Arguments @('fmt', '--overwrite', $caddyfile) -Quiet | Out-Null
     $validation = Invoke-Native -Exe $caddy -Arguments @('validate', '--config', $caddyfile) -Quiet
     if ($validation.ExitCode -ne 0) {
         Warn 'caddy says the config is not valid  the service is still registered so you can fix the Caddyfile and restart it'

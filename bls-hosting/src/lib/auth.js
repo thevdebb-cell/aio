@@ -20,8 +20,14 @@ function parseCookies(header) {
   return out;
 }
 
+// Behind the reverse proxy the socket address is always 127.0.0.1 so the per IP
+// lockout would lock everyone out at once and the audit log would name nobody.
+// Express resolves req.ip through the trust proxy setting  the socket is the
+// fallback for callers that are not express requests
 function clientIp(req) {
-  return (req.socket && req.socket.remoteAddress) || 'unknown';
+  const resolved = req && req.ip;
+  const raw = resolved || (req && req.socket && req.socket.remoteAddress) || 'unknown';
+  return String(raw).replace(/^::ffff:/, '');
 }
 
 function pruneSessions() {
