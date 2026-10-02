@@ -281,6 +281,25 @@ Install-BlsService -Name 'bls-panel' -Exe $nodeExe -Arguments (Join-Path $PanelD
 
 # --- 7  caddy -----------------------------------------------------------------
 
+# One host runs one Caddy. A second instance cannot share ports 80 443 and the
+# admin port 2019 so it would sit there failing to start while the first one
+# keeps serving. If one is already running the panel joins it instead
+$existingCaddy = Get-Process caddy -ErrorAction SilentlyContinue |
+    Where-Object { $_.Path -and $_.Path -notlike "$Root*" } |
+    Select-Object -First 1
+
+if ($existingCaddy -and -not $SkipCaddy) {
+    Step 'A Caddy is already running on this host'
+    Warn "found $($existingCaddy.Path) running as pid $($existingCaddy.Id)"
+    Say 'a second Caddy cannot bind the same ports so this installer will not start one'
+    Say ''
+    Say 'add the panel to that Caddy instead  from this folder run'
+    Say "  .\scripts\attach-to-caddy.ps1 -Caddyfile `"$(Join-Path (Split-Path -Parent $existingCaddy.Path) 'Caddyfile')`" -Domain $Domain -Port $Port"
+    Say ''
+    Say 'it backs the file up  validates before reloading and rolls back on failure'
+    $SkipCaddy = $true
+}
+
 if (-not $SkipCaddy) {
     Step 'Setting up Caddy for https'
     $caddyDir = Join-Path $ToolsDir 'caddy'

@@ -92,6 +92,28 @@ minute after the record resolves. If the OVH **network** firewall is enabled in
 the OVH control panel, remember it is a second layer in front of the VPS — port
 80 and 443 must be open there too, or validation times out.
 
+### If a Caddy already runs on this host
+
+One machine runs one Caddy. A second instance cannot share ports 80, 443 and the
+admin port 2019, so it sits in a failed state while the first keeps serving. The
+installer detects this and declines to start a second one.
+
+Join the existing instance instead:
+
+```powershell
+.\scripts\attach-to-caddy.ps1 `
+    -Caddyfile C:\nyuc\tools\caddy\Caddyfile `
+    -Service   nyuc-caddy `
+    -Domain    bls.blociapps.com `
+    -Port      3300 `
+    -RemoveBlsCaddy
+```
+
+It backs the Caddyfile up, appends the site block only (a second global options
+block would be a syntax error), formats and validates, and **restores the backup
+if validation fails**. On success it reloads with `caddy reload`, so the sites
+already being served never drop a request.
+
 ### Your icons
 
 Drop five png files in `C:\bls\panel\public\img`:
