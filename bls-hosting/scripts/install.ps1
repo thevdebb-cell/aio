@@ -352,11 +352,50 @@ if (-not $SkipFirewall) {
 # --- 9  start -----------------------------------------------------------------
 
 Step 'Starting everything'
-Start-Service bls-panel
-Start-Sleep -Seconds 4
+
+# A service that will not start says nothing useful on its own. Show the tail of
+# the log it was redirected to so the reason is on screen straight away
+function Start-BlsService {
+    param([string] $Name, [string] $LogName)
+    try {
+        Start-Service $Name -ErrorAction Stop
+        Start-Sleep -Seconds 3
+        $state = (Get-Service $Name).Status
+        if ($state -ne 'Running') { throw "service is $state" }
+        Good "$Name is running"
+        return $true
+    } catch {
+        Warn "$Name did not start  $($_.Exception.Message)"
+        foreach ($which in @('err', 'out')) {
+            $log = Join-Path $Root "logs\$LogName\$which.log"
+            if ((Test-Path $log) -and (Get-Item $log).Length -gt 0) {
+                Write-Host "  ---- last lines of $which.log ----" -ForegroundColor DarkGray
+                Get-Content $log -Tail 15 | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+            }
+        }
+        return $false
+    }
+}
+
+$panelUp = Start-BlsService -Name 'bls-panel' -LogName 'panel'
+
 if (-not $SkipCaddy) {
-    Start-Service bls-caddy
-    Start-Sleep -Seconds 2
+    # Caddy owns 80 and 443 so anything already holding them stops it dead
+    foreach ($p in @(80, 443)) {
+        $holder = Get-NetTCPConnection -LocalPort $p -State Listen -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+        if ($holder) {
+            $owner = (Get-Process -Id $holder.OwningProcess -ErrorAction SilentlyContinue).ProcessName
+            if ($owner -and $owner -ne 'caddy') {
+                Warn "port $p is already held by $owner (pid $($holder.OwningProcess))  Caddy cannot bind it"
+                if ($owner -eq 'System') {
+                    Say 'that is usually IIS or the Windows http driver  check with  netsh http show servicestate'
+                    Say 'if IIS is the cause  Stop-Service W3SVC  then  Set-Service W3SVC -StartupType Disabled'
+                }
+            }
+        }
+    }
+    Start-BlsService -Name 'bls-caddy' -LogName 'caddy' | Out-Null
 }
 
 $healthy = $false
