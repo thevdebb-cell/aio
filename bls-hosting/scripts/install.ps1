@@ -36,6 +36,29 @@ function Good   ($m) { Write-Host "  $m" -ForegroundColor Green }
 function Warn   ($m) { Write-Host "  $m" -ForegroundColor Yellow }
 function Fail   ($m) { Write-Host "`n  $m" -ForegroundColor Red; exit 1 }
 
+# Caddy npm and nssm all write progress to stderr. With ErrorActionPreference set
+# to Stop PowerShell turns that into a terminating error and the install dies on a
+# perfectly normal info line. Native tools are judged on their exit code instead.
+function Invoke-Native {
+    param(
+        [Parameter(Mandatory = $true)][string] $Exe,
+        [string[]] $Arguments = @(),
+        [switch] $Quiet
+    )
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & $Exe @Arguments 2>&1
+        $code = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previous
+    }
+    if (-not $Quiet) {
+        $output | ForEach-Object { Say ($_ -replace '\s+$', '') }
+    }
+    return [pscustomobject]@{ ExitCode = $code; Output = $output }
+}
+
 Write-Host ""
 Write-Host "  BLS.Hosting installer" -ForegroundColor White
 Write-Host "  internal bot hosting for blociapps" -ForegroundColor DarkGray
@@ -131,8 +154,8 @@ Push-Location $PanelDir
 try {
     $installArgs = if (Test-Path (Join-Path $PanelDir 'package-lock.json')) { @('ci', '--omit=dev', '--no-audit', '--no-fund') }
                    else { @('install', '--omit=dev', '--no-audit', '--no-fund') }
-    & $npmCmd @installArgs
-    if ($LASTEXITCODE -ne 0) { Fail "npm exited with $LASTEXITCODE" }
+    $npmRun = Invoke-Native -Exe $npmCmd -Arguments $installArgs
+    if ($npmRun.ExitCode -ne 0) { Fail "npm exited with $($npmRun.ExitCode)" }
 } finally {
     Pop-Location
 }
@@ -279,12 +302,6 @@ if (-not $SkipCaddy) {
 $Domain {
     encode gzip
 
-    @ws {
-        header Connection *Upgrade*
-        header Upgrade websocket
-    }
-    reverse_proxy @ws 127.0.0.1:$Port
-
     reverse_proxy 127.0.0.1:$Port {
         header_up X-Forwarded-Proto {scheme}
         header_up X-Real-IP {remote_host}
@@ -306,8 +323,13 @@ $Domain {
     Good "wrote $caddyfile"
 
     New-Item -Path (Join-Path $Root 'logs\caddy') -ItemType Directory -Force | Out-Null
-    & $caddy validate --config $caddyfile 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) { Warn 'caddy says the config is not valid  check the Caddyfile' }
+    $validation = Invoke-Native -Exe $caddy -Arguments @('validate', '--config', $caddyfile) -Quiet
+    if ($validation.ExitCode -ne 0) {
+        Warn 'caddy says the config is not valid  the service is still registered so you can fix the Caddyfile and restart it'
+        $validation.Output | ForEach-Object { Say ($_ -replace '\s+$', '') }
+    } else {
+        Good 'Caddyfile is valid'
+    }
 
     Install-BlsService -Name 'bls-caddy' -Exe $caddy -Arguments "run --config `"$caddyfile`"" -WorkDir $caddyDir -LogName 'caddy'
 }
