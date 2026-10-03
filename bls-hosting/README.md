@@ -116,14 +116,22 @@ already being served never drop a request.
 
 ### Your icons
 
-Drop five png files in `C:\bls\panel\public\img`:
+Five png files in `C:\bls\panel\public\img`:
 
 ```
 bls-logo.png  intranex.png  bls-hosting.png  myorder.png  myspace.png
 ```
 
-Square, transparent background, 128 or 256 pixels. A missing file is not an
-error — the tile falls back to the first letter of its name.
+Placeholders ship with the panel so nothing looks broken on a fresh install —
+overwrite them with your own artwork, same file names. Square, transparent
+background, 256 pixels. Avoid pure black or pure white artwork since the panel
+has both a dark and a light theme. A missing file is not an error — the tile
+falls back to the first letter of its name.
+
+Those five are the **only** images the panel loads. Every button and tab icon is
+drawn inline by `public/js/icons.js`, so it inherits the surrounding text colour
+and follows the theme without a second set of files. To change one, edit the
+path data for that name in that file.
 
 ---
 

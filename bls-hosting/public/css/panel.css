@@ -485,3 +485,13 @@ table.grid tr.clickable:hover td { background: var(--surface-2); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } .meter > i { transition: none; } }
+
+/* ---------- icons ---------- */
+
+button svg, .btn svg, .nav-item svg, .tab svg { flex: none; }
+.nav-item svg { opacity: 0.75; }
+.nav-item:hover svg, .nav-item.on svg { opacity: 1; }
+.tab { display: inline-flex; align-items: center; gap: 7px; }
+.tab svg { opacity: 0.8; }
+.tab.on svg { opacity: 1; }
+.topbar button svg { opacity: 0.8; }

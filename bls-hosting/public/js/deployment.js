@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { el, clear, toast, openModal, confirmBox, field, fmtBytes, fmtMb, fmtDuration, fmtTime, fmtClock, copyText } from './ui.js';
+import { icon } from './icons.js';
 
 let ws = null;
 let current = null;
@@ -69,17 +70,17 @@ export async function renderDeployment(host, id, tab) {
         button.disabled = false;
       }
     };
-    const mk = (label, action, cls) => {
-      const button = el('button', { class: cls, text: label });
+    const mk = (label, action, cls, ico) => {
+      const button = el('button', { class: cls }, icon(ico, 14), label);
       button.addEventListener('click', () => act(action, button));
       return button;
     };
     controls.append(
-      mk('Start', 'start', 'primary'),
-      mk('Stop', 'stop', ''),
-      mk('Restart', 'restart', ''),
-      mk('Kill', 'kill', 'danger'),
-      mk('Install deps', 'install', '')
+      mk('Start', 'start', 'primary', 'start'),
+      mk('Stop', 'stop', '', 'stop'),
+      mk('Restart', 'restart', '', 'restart'),
+      mk('Kill', 'kill', 'danger', 'kill'),
+      mk('Install deps', 'install', '', 'install')
     );
   } else {
     controls.append(el('span', { class: 'chip', text: 'viewer role  read only' }));
@@ -89,16 +90,17 @@ export async function renderDeployment(host, id, tab) {
     'div',
     { class: 'tabs' },
     ...[
-      ['console', 'Console'],
-      ['files', 'Files'],
-      ['env', 'Environment'],
-      ['settings', 'Settings'],
-    ].map(([key, label]) =>
-      el('button', {
-        class: `tab${tab === key ? ' on' : ''}`,
-        text: label,
-        onclick: () => panel.go(`#/d/${id}/${key}`),
-      })
+      ['console', 'Console', 'console'],
+      ['files', 'Files', 'files'],
+      ['env', 'Environment', 'env'],
+      ['settings', 'Settings', 'settings'],
+    ].map(([key, label, ico]) =>
+      el(
+        'button',
+        { class: `tab${tab === key ? ' on' : ''}`, onclick: () => panel.go(`#/d/${id}/${key}`) },
+        icon(ico, 15),
+        label
+      )
     )
   );
 
@@ -153,10 +155,9 @@ async function renderConsole(host, id, admin) {
     });
     bar.append(
       input,
-      el('button', { text: 'Send', onclick: send }),
+      el('button', { onclick: send }, icon('send', 14), 'Send'),
       el('button', {
         class: 'ghost',
-        text: 'Clear',
         onclick: async () => {
           try {
             await api(`/deployments/${id}/console/clear`, { method: 'POST' });
@@ -164,7 +165,7 @@ async function renderConsole(host, id, admin) {
             toast(err.message, 'bad');
           }
         },
-      })
+      }, icon('clear', 14), 'Clear')
     );
   } else {
     bar.append(el('span', { class: 'dim', style: 'font-size:12px', text: 'viewers can read the console but cannot type into it' }));
@@ -241,43 +242,42 @@ async function paintDir(wrap, id, admin, dirPath) {
   const tools = el('div', { class: 'row', style: 'margin-bottom:12px' });
   if (admin) {
     tools.append(
-      el('button', { class: 'sm', text: 'New file', onclick: () => createEntry(wrap, id, admin, listing.path, 'file') }),
-      el('button', { class: 'sm', text: 'New folder', onclick: () => createEntry(wrap, id, admin, listing.path, 'dir') }),
-      el('button', {
-        class: 'sm',
-        text: 'Download all',
-        onclick: () => downloadZip(id),
-      })
+      el('button', { class: 'sm', onclick: () => createEntry(wrap, id, admin, listing.path, 'file') }, icon('file', 13), 'New file'),
+      el('button', { class: 'sm', onclick: () => createEntry(wrap, id, admin, listing.path, 'dir') }, icon('folder', 13), 'New folder'),
+      el('button', { class: 'sm', onclick: () => downloadZip(id) }, icon('download', 13), 'Download all')
     );
   }
-  tools.append(el('span', { class: 'grow' }), el('button', { class: 'sm ghost', text: 'Reload', onclick: () => paintDir(wrap, id, admin, listing.path) }));
+  tools.append(
+    el('span', { class: 'grow' }),
+    el('button', { class: 'sm ghost', onclick: () => paintDir(wrap, id, admin, listing.path) }, icon('refresh', 13), 'Reload')
+  );
 
   const rows = listing.entries.map((entry) => {
     const actions = el('div', { class: 'row tight', style: 'justify-content:flex-end' });
     if (entry.kind === 'file') {
       if (entry.editable) {
         actions.append(
-          el('button', { class: 'sm ghost', text: admin ? 'Edit' : 'View', onclick: () => openEditor(wrap, id, admin, entry.path, listing.path) })
+          el('button', { class: 'sm ghost', onclick: () => openEditor(wrap, id, admin, entry.path, listing.path) }, icon(admin ? 'edit' : 'eye', 13), admin ? 'Edit' : 'View')
         );
       }
       if (admin) {
         actions.append(
-          el('button', { class: 'sm ghost', text: 'Startup', title: 'Use this file as the entry point', onclick: () => setStartup(id, entry.path) }),
-          el('button', { class: 'sm ghost', text: 'Get', onclick: () => downloadFile(id, entry.path) })
+          el('button', { class: 'sm ghost', title: 'Use this file as the entry point', onclick: () => setStartup(id, entry.path) }, icon('startup', 13), 'Startup'),
+          el('button', { class: 'sm ghost', onclick: () => downloadFile(id, entry.path) }, icon('download', 13), 'Get')
         );
       }
     }
     if (admin) {
       actions.append(
-        el('button', { class: 'sm ghost', text: 'Rename', onclick: () => renameEntry(wrap, id, admin, entry, listing.path) }),
-        el('button', { class: 'sm danger', text: 'Delete', onclick: () => deleteEntry(wrap, id, admin, entry, listing.path) })
+        el('button', { class: 'sm ghost', onclick: () => renameEntry(wrap, id, admin, entry, listing.path) }, icon('rename', 13), 'Rename'),
+        el('button', { class: 'sm danger', onclick: () => deleteEntry(wrap, id, admin, entry, listing.path) }, icon('trash', 13), 'Delete')
       );
     }
 
     const name = el(
       'div',
       { class: 'row tight' },
-      el('span', { class: 'dim', text: entry.kind === 'dir' ? '[dir]' : '[file]' }),
+      el('span', { class: 'dim', style: 'display:inline-flex' }, icon(entry.kind === 'dir' ? 'folder' : 'file', 15)),
       entry.kind === 'dir'
         ? el('button', { class: 'ghost sm', style: 'font-weight:600', text: entry.name, onclick: () => paintDir(wrap, id, admin, entry.path) })
         : el('span', { style: 'font-weight:500', text: entry.name }),
@@ -327,7 +327,7 @@ function uploadZone(wrap, id, admin) {
     el(
       'div',
       { class: 'row', style: 'justify-content:center;margin-top:12px' },
-      el('button', { class: 'primary sm', text: 'Choose zip', onclick: () => fileInput.click() }),
+      el('button', { class: 'primary sm', onclick: () => fileInput.click() }, icon('upload', 13), 'Choose zip'),
       el('label', { class: 'row tight', style: 'font-size:12px;font-weight:600' }, cleanBox, 'Clear the folder first')
     ),
     status,
@@ -384,7 +384,7 @@ async function openEditor(wrap, id, admin, filePath, dirPath) {
   const area = el('textarea', { class: 'editor', spellcheck: 'false', readOnly });
   area.value = data.file.content;
 
-  const saveBtn = el('button', { class: 'primary', text: 'Save' });
+  const saveBtn = el('button', { class: 'primary' }, icon('save', 14), 'Save');
   const status = el('span', { class: 'dim', style: 'font-size:12px', text: `${fmtBytes(data.file.size)}  changed ${fmtTime(data.file.modified)}` });
 
   saveBtn.addEventListener('click', async () => {
@@ -411,7 +411,7 @@ async function openEditor(wrap, id, admin, filePath, dirPath) {
     el(
       'div',
       { class: 'row', style: 'margin-bottom:10px' },
-      el('button', { class: 'sm', text: 'Back to files', onclick: () => paintDir(wrap, id, admin, dirPath) }),
+      el('button', { class: 'sm', onclick: () => paintDir(wrap, id, admin, dirPath) }, icon('back', 13), 'Back to files'),
       el('span', { class: 'mono grow', text: filePath }),
       readOnly ? el('span', { class: 'chip', text: 'read only' }) : saveBtn
     ),
@@ -575,7 +575,7 @@ async function renderEnv(host, id, admin) {
     }
   };
 
-  const revealBtn = el('button', { class: 'sm', text: 'Reveal values' });
+  const revealBtn = el('button', { class: 'sm' }, icon('eye', 13), 'Reveal values');
   revealBtn.addEventListener('click', async () => {
     if (revealed) {
       await renderEnv(host, id, admin);
@@ -609,10 +609,10 @@ async function renderEnv(host, id, admin) {
     el(
       'div',
       { class: 'row', style: 'margin-bottom:12px' },
-      admin ? el('button', { class: 'sm', text: 'Add key', onclick: () => addRow() }) : null,
+      admin ? el('button', { class: 'sm', onclick: () => addRow() }, icon('plus', 13), 'Add key') : null,
       data.canReveal ? revealBtn : el('span', { class: 'chip', text: 'values stay hidden for viewers' }),
       el('span', { class: 'grow' }),
-      admin ? el('button', { class: 'primary', text: 'Save environment', onclick: save }) : null
+      admin ? el('button', { class: 'primary', onclick: save }, icon('save', 14), 'Save environment') : null
     ),
     card
   );
@@ -702,7 +702,7 @@ async function renderSettings(host, id, admin, panel) {
       el('label', { class: 'row tight', style: 'font-size:13px;font-weight:600' }, autoRestart, 'Restart after a crash')
     ),
     field('Notes', notesInput),
-    admin ? el('button', { class: 'primary', text: 'Save settings', onclick: save }) : el('span', { class: 'chip', text: 'viewer role  read only' })
+    admin ? el('button', { class: 'primary', onclick: save }, icon('save', 14), 'Save settings') : el('span', { class: 'chip', text: 'viewer role  read only' })
   );
 
   const infoCard = el(
@@ -796,7 +796,7 @@ async function codesCard(id, deployment) {
     await openModal({
       title: 'Copy this code now',
       lead: result.note,
-      body: el('div', {}, box, el('div', { class: 'row', style: 'justify-content:center;margin-top:12px' }, el('button', { class: 'sm', text: 'Copy', onclick: () => copyText(result.code) }))),
+      body: el('div', {}, box, el('div', { class: 'row', style: 'justify-content:center;margin-top:12px' }, el('button', { class: 'sm', onclick: () => copyText(result.code) }, icon('copy', 13), 'Copy'))),
       confirmLabel: 'Done',
       cancelLabel: 'Close',
       onConfirm: () => true,
@@ -809,8 +809,8 @@ async function codesCard(id, deployment) {
       'div',
       { class: 'row' },
       el('h2', { class: 'sec grow', style: 'margin:0', text: 'Access codes for this deployment' }),
-      el('button', { class: 'sm', text: 'New viewer code', onclick: () => generate('viewer') }),
-      el('button', { class: 'sm', text: 'New admin code', onclick: () => generate('admin') })
+      el('button', { class: 'sm', onclick: () => generate('viewer') }, icon('key', 13), 'New viewer code'),
+      el('button', { class: 'sm', onclick: () => generate('admin') }, icon('key', 13), 'New admin code')
     ),
     el('p', { class: 'lead', style: 'margin:6px 0 12px', text: 'A code made here opens this deployment only  nothing else on the panel' }),
     body
@@ -827,7 +827,6 @@ function dangerCard(id, deployment, panel) {
     el('p', { class: 'lead', style: 'margin:0 0 12px', text: 'The process is killed and the folder with the logs is wiped  there is no undo' }),
     el('button', {
       class: 'danger',
-      text: `Delete ${deployment.name}`,
       onclick: async () => {
         const confirmInput = el('input', { placeholder: deployment.name });
         const ok = await openModal({
@@ -846,6 +845,6 @@ function dangerCard(id, deployment, panel) {
         await panel.refreshDeployments();
         panel.go('#/overview');
       },
-    })
+    }, icon('trash', 14), `Delete ${deployment.name}`)
   );
 }

@@ -1,5 +1,6 @@
 import { api, setCsrf } from './api.js';
 import { el, clear, tidy, toast, openModal, confirmBox, field, fmtBytes, fmtMb, fmtDuration, fmtTime, statCard, meterClass } from './ui.js';
+import { icon } from './icons.js';
 import { renderDeployment, closeConsole } from './deployment.js';
 
 export const state = {
@@ -100,11 +101,11 @@ window.addEventListener('hashchange', render);
 
 // ---------- shell -------------------------------------------------------------
 
-function navItem({ label, hash, dot, right, on }) {
+function navItem({ label, hash, dot, right, on, ico }) {
   return el(
     'button',
     { class: `nav-item${on ? ' on' : ''}`, onclick: () => go(hash) },
-    dot ? el('span', { class: `dot ${dot}` }) : null,
+    dot ? el('span', { class: `dot ${dot}` }) : ico ? icon(ico, 16) : null,
     el('span', { class: 'grow', text: label }),
     right ? el('span', { class: 'tiny', text: right }) : null
   );
@@ -121,9 +122,9 @@ function renderSide() {
         'div',
         { class: 'nav-group' },
         el('div', { class: 'nav-label', text: 'Panel' }),
-        navItem({ label: 'Overview', hash: '#/overview', on: route.view === 'overview' }),
-        navItem({ label: 'Runtimes', hash: '#/runtimes', on: route.view === 'runtimes' }),
-        isAdmin() ? navItem({ label: 'Activity', hash: '#/activity', on: route.view === 'activity' }) : null
+        navItem({ label: 'Overview', hash: '#/overview', ico: 'overview', on: route.view === 'overview' }),
+        navItem({ label: 'Runtimes', hash: '#/runtimes', ico: 'runtime', on: route.view === 'runtimes' }),
+        isAdmin() ? navItem({ label: 'Activity', hash: '#/activity', ico: 'activity', on: route.view === 'activity' }) : null
       )
     );
   }
@@ -148,7 +149,7 @@ function renderSide() {
   }
   if (isAdmin() && !scoped) {
     list.append(
-      el('button', { class: 'nav-item', onclick: openCreate }, el('span', { class: 'grow', text: '＋ New deployment' }))
+      el('button', { class: 'nav-item', onclick: openCreate }, icon('plus', 16), el('span', { class: 'grow', text: 'New deployment' }))
     );
   }
   groups.push(list);
@@ -296,11 +297,11 @@ function deploymentRow(deployment) {
   if (isAdmin()) {
     if (deployment.status === 'running') {
       actions.append(
-        el('button', { class: 'sm', text: 'Restart', onclick: (event) => actOn(event, deployment.id, 'restart') }),
-        el('button', { class: 'sm danger', text: 'Stop', onclick: (event) => actOn(event, deployment.id, 'stop') })
+        el('button', { class: 'sm', onclick: (event) => actOn(event, deployment.id, 'restart') }, icon('restart', 13), 'Restart'),
+        el('button', { class: 'sm danger', onclick: (event) => actOn(event, deployment.id, 'stop') }, icon('stop', 13), 'Stop')
       );
     } else {
-      actions.append(el('button', { class: 'sm primary', text: 'Start', onclick: (event) => actOn(event, deployment.id, 'start') }));
+      actions.append(el('button', { class: 'sm primary', onclick: (event) => actOn(event, deployment.id, 'start') }, icon('start', 13), 'Start'));
     }
   }
   actions.append(el('button', { class: 'sm ghost', text: 'Open', onclick: () => go(`#/d/${deployment.id}/console`) }));
@@ -382,7 +383,7 @@ async function renderRuntimes(host) {
           'div',
           { class: 'row tight', style: 'justify-content:flex-end' },
           el('span', { class: 'chip ok', text: `ready ${runtime.installedVersion}` }),
-          isAdmin() ? el('button', { class: 'sm danger', text: 'Remove', onclick: () => removeRuntime(runtime) }) : null
+          isAdmin() ? el('button', { class: 'sm danger', onclick: () => removeRuntime(runtime) }, icon('trash', 13), 'Remove') : null
         )
       : isAdmin()
         ? el('button', { class: 'sm primary', text: 'Install', onclick: () => installRuntime(runtime) })
@@ -604,6 +605,8 @@ export async function openCreate() {
 
 async function boot() {
   initTheme();
+  document.getElementById('themeBtn').prepend(icon('theme', 14));
+  document.getElementById('signOutBtn').prepend(icon('logout', 14));
   try {
     const me = await api('/auth/me');
     if (!me.signedIn) {
